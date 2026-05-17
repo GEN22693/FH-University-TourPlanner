@@ -7,8 +7,12 @@ namespace TourPlanner.Api.Controllers;
 public class HealthController : ControllerBase
 {
     [HttpGet]
-    public ActionResult<string> Get()
+    public IActionResult Get()
     {
-        return "TourPlanner API is running";
+        return Ok(new
+        {
+            status = "ok",
+            message = "TourPlanner API is running"
+        });
     }
 }

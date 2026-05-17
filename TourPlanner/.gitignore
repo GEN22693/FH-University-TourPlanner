@@ -5,10 +5,6 @@
 *.userosscache
 *.sln.docstates
 
-# Rider
-.idea/
-*.sln.iml
-
 # VS Code
 .vscode/
 

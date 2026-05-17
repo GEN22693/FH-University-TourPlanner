@@ -1,14 +1,12 @@
 using TourPlanner.Models.Enums;
 
-namespace TourPlanner.Models;
+namespace TourPlanner.Models.Dtos;
 
-public class TourLog
+public class TourLogResponseDto
 {
     public int Id { get; set; }
 
     public int TourId { get; set; }
-
-    public Tour? Tour { get; set; }
 
     public DateTime DateTime { get; set; }
 

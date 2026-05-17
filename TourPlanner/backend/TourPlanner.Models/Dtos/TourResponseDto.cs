@@ -1,14 +1,10 @@
 using TourPlanner.Models.Enums;
 
-namespace TourPlanner.Models;
+namespace TourPlanner.Models.Dtos;
 
-public class Tour
+public class TourResponseDto
 {
     public int Id { get; set; }
-
-    public int UserId { get; set; }
-
-    public User? User { get; set; }
 
     public string Name { get; set; } = string.Empty;
 
@@ -25,8 +21,4 @@ public class Tour
     public TimeSpan EstimatedTime { get; set; }
 
     public string RouteInformation { get; set; } = string.Empty;
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    public List<TourLog> TourLogs { get; set; } = [];
 }
