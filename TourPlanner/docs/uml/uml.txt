@@ -1,0 +1,108 @@
+@startuml
+title TourPlanner - Layered Architecture
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "User" as User
+
+package "Frontend\nAngular" {
+  component "Views / Templates" as Views
+  component "Components\nViewModel" as Components
+  component "Angular Services" as AngularServices
+}
+
+package "Backend\nASP.NET Core Web API" {
+
+  package "TourPlanner.Api\nPresentation Layer" {
+    component "HealthController" as HealthController
+    component "TourController" as TourController
+    component "TourLogController" as TourLogController
+    component "AuthController" as AuthController
+  }
+
+  package "TourPlanner.Business\nBusiness Layer" {
+    component "ITourService" as ITourService
+    component "TourService" as TourService
+    component "ITourLogService" as ITourLogService
+    component "TourLogService" as TourLogService
+    component "IAuthService" as IAuthService
+    component "AuthService" as AuthService
+    component "Validation Logic" as Validation
+    component "Computed Attributes\nPopularity / Child-Friendliness" as Computed
+  }
+
+  package "TourPlanner.Data\nData Access Layer" {
+    component "ITourRepository" as ITourRepository
+    component "TourRepository" as TourRepository
+    component "ITourLogRepository" as ITourLogRepository
+    component "TourLogRepository" as TourLogRepository
+    component "IUserRepository" as IUserRepository
+    component "UserRepository" as UserRepository
+    component "AppDbContext" as DbContext
+  }
+
+  package "TourPlanner.Models\nShared Models" {
+    component "User Entity" as UserEntity
+    component "Tour Entity" as TourEntity
+    component "TourLog Entity" as TourLogEntity
+    component "DTOs" as DTOs
+    component "TransportType Enum" as TransportType
+    component "Difficulty Enum" as Difficulty
+  }
+}
+
+database "PostgreSQL Database" as PostgreSQL
+
+cloud "External API" {
+  component "OpenRouteService API" as ORS
+}
+
+User --> Views : uses
+Views --> Components
+Components --> AngularServices
+AngularServices --> TourController : HTTP / JSON
+AngularServices --> TourLogController : HTTP / JSON
+AngularServices --> AuthController : HTTP / JSON
+
+HealthController --> TourService : optional check
+TourController --> ITourService
+TourLogController --> ITourLogService
+AuthController --> IAuthService
+
+ITourService <|.. TourService
+ITourLogService <|.. TourLogService
+IAuthService <|.. AuthService
+
+TourService --> ITourRepository
+TourLogService --> ITourLogRepository
+AuthService --> IUserRepository
+
+ITourRepository <|.. TourRepository
+ITourLogRepository <|.. TourLogRepository
+IUserRepository <|.. UserRepository
+
+TourRepository --> DbContext
+TourLogRepository --> DbContext
+UserRepository --> DbContext
+DbContext --> PostgreSQL : Entity Framework Core
+
+TourService --> Validation
+TourLogService --> Validation
+TourService --> Computed
+TourService --> ORS : distance / duration
+
+TourController --> DTOs
+TourLogController --> DTOs
+AuthController --> DTOs
+
+TourService --> TourEntity
+TourLogService --> TourLogEntity
+AuthService --> UserEntity
+
+UserEntity --> TourEntity : owns many
+TourEntity --> TourLogEntity : has many
+TourEntity --> TransportType
+TourLogEntity --> Difficulty
+
+@enduml
