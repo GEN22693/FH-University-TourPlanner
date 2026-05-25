@@ -1,0 +1,163 @@
+<section class="min-h-dvh bg-[#f4efe7] px-4 py-5 text-slate-950 sm:px-6 lg:grid lg:place-items-center">
+  <main class="mx-auto grid min-h-[calc(100dvh-2.5rem)] w-full max-w-6xl overflow-hidden rounded-[2rem] border border-black/5 bg-white shadow-2xl shadow-slate-900/10 lg:min-h-[720px] lg:grid-cols-[0.95fr_1.05fr]">
+    <section class="relative hidden overflow-hidden bg-[#111827] p-10 text-white lg:flex lg:flex-col lg:justify-between xl:p-12">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(245,158,11,0.22),transparent_28%),radial-gradient(circle_at_90%_80%,rgba(20,184,166,0.14),transparent_32%)]"></div>
+
+      <div class="relative z-10">
+        <div class="flex items-center gap-3">
+          <div class="grid h-10 w-10 place-items-center rounded-2xl bg-amber-400 text-sm font-black text-slate-950">
+            TP
+          </div>
+
+          <div>
+            <p class="text-xl font-black tracking-tight">Tour Planner</p>
+            <p class="text-xs font-semibold text-white/45">Private route workspace</p>
+          </div>
+        </div>
+
+        <div class="mt-20">
+          <p class="mb-4 text-xs font-black uppercase tracking-[0.3em] text-amber-300">
+            Plan with clarity
+          </p>
+
+          <h1 class="max-w-md text-5xl font-black leading-[1.02] tracking-[-0.05em]">
+            Your tours, logs and maps in one calm place.
+          </h1>
+
+          <p class="mt-6 max-w-md text-base leading-7 text-white/58">
+            A focused workspace for planning routes, tracking tour logs and keeping every journey private.
+          </p>
+        </div>
+      </div>
+
+      <div class="relative z-10 rounded-[1.75rem] border border-white/10 bg-white/[0.06] p-5 backdrop-blur-xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-black">Route sample</p>
+            <p class="mt-1 text-xs font-semibold text-white/45">Vienna → Klosterneuburg</p>
+          </div>
+
+          <div class="rounded-full bg-white px-3 py-1.5 text-xs font-black text-slate-900">
+            18.4 km
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <svg
+            class="h-24 w-full"
+            viewBox="0 0 520 110"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M22 82 C115 18 210 42 285 55 C370 70 423 48 498 20"
+              stroke="#f59e0b"
+              stroke-width="5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="22" cy="82" r="10" fill="#111827" stroke="white" stroke-width="4" />
+            <circle cx="498" cy="20" r="11" fill="#f59e0b" stroke="white" stroke-width="4" />
+          </svg>
+        </div>
+
+        <div class="mt-5 grid grid-cols-3 gap-3">
+          <div class="rounded-2xl bg-white/[0.07] p-3">
+            <p class="text-sm font-black">Bike</p>
+            <p class="mt-1 text-[11px] font-semibold text-white/40">Transport</p>
+          </div>
+
+          <div class="rounded-2xl bg-white/[0.07] p-3">
+            <p class="text-sm font-black">54 min</p>
+            <p class="mt-1 text-[11px] font-semibold text-white/40">Time</p>
+          </div>
+
+          <div class="rounded-2xl bg-white/[0.07] p-3">
+            <p class="text-sm font-black">Private</p>
+            <p class="mt-1 text-[11px] font-semibold text-white/40">User data</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="flex min-h-full items-center justify-center px-6 py-10 sm:px-10 lg:px-14">
+      <div class="w-full max-w-[25rem]">
+        <div class="mb-10 lg:hidden">
+          <div class="flex items-center gap-3">
+            <div class="grid h-10 w-10 place-items-center rounded-2xl bg-slate-950 text-sm font-black text-amber-300">
+              TP
+            </div>
+
+            <div>
+              <p class="text-xl font-black tracking-tight">Tour Planner</p>
+              <p class="text-xs font-semibold text-slate-500">Private route workspace</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-xs font-black uppercase tracking-[0.28em] text-amber-600">
+            Welcome back
+          </p>
+
+          <h2 class="mt-3 text-4xl font-black tracking-[-0.04em] text-slate-950">
+            Sign in
+          </h2>
+
+          <p class="mt-3 text-sm leading-6 text-slate-500">
+            Continue planning your routes and managing your tour logs.
+          </p>
+        </div>
+
+        <form class="mt-8 space-y-5" (ngSubmit)="signIn()">
+          <label class="block">
+            <span class="text-xs font-black text-slate-600">Email address</span>
+            <input
+              class="mt-2 w-full rounded-2xl border border-slate-200 bg-[#faf8f4] px-5 py-4 text-sm font-bold text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-500/10"
+              type="email"
+              name="email"
+              [(ngModel)]="email"
+              placeholder="user@example.at"
+            />
+          </label>
+
+          <label class="block">
+            <span class="text-xs font-black text-slate-600">Password</span>
+            <input
+              class="mt-2 w-full rounded-2xl border border-slate-200 bg-[#faf8f4] px-5 py-4 text-sm font-bold text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-500/10"
+              type="password"
+              name="password"
+              [(ngModel)]="password"
+              placeholder="********"
+            />
+          </label>
+
+          @if (errorMessage) {
+            <p class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-600">
+              {{ errorMessage }}
+            </p>
+          }
+
+          <button
+            class="w-full rounded-2xl bg-slate-950 px-5 py-4 text-sm font-black text-white shadow-xl shadow-slate-950/15 transition hover:-translate-y-0.5 hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-950/10 active:translate-y-0"
+            type="submit"
+          >
+            Sign in
+          </button>
+
+          <a
+            class="flex w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-black text-slate-950 transition hover:bg-[#faf8f4]"
+            routerLink="/register"
+          >
+            Create account
+          </a>
+        </form>
+
+        <p class="mt-8 text-xs font-bold leading-5 text-slate-400">
+          Every tour and tour log belongs only to the user who created it.
+        </p>
+      </div>
+    </section>
+  </main>
+</section>
