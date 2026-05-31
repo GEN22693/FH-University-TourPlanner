@@ -1,38 +1,80 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
-import { LoginRequest, LoginResponse, RegisterRequest, AuthUser } from '../../models/auth.model';
+import { Injectable, computed, signal } from '@angular/core';
+import { AppUser, LoginData, RegisterData } from '../../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:5161/api/auth';
+  private readonly usersKey = 'tourplanner_users';
+  private readonly currentUserKey = 'tourplanner_current_user';
 
-  constructor(private readonly http: HttpClient) {}
+  private readonly currentUserSignal = signal<AppUser | null>(this.loadCurrentUser());
 
-  register(data: RegisterRequest): Observable<AuthUser> {
-    return this.http.post<AuthUser>(`${this.apiUrl}/register`, data);
+  readonly currentUser = this.currentUserSignal.asReadonly();
+  readonly isLoggedIn = computed(() => this.currentUserSignal() !== null);
+
+  register(data: RegisterData): string | null {
+    const users = this.loadUsers();
+
+    const emailExists = users.some((user) => user.email.toLowerCase() === data.email.toLowerCase());
+
+    if (emailExists) {
+      return 'This email is already registered.';
+    }
+
+    const newUser: AppUser = {
+      id: crypto.randomUUID(),
+      username: data.username,
+      email: data.email,
+      password: data.password,
+    };
+
+    users.push(newUser);
+    localStorage.setItem(this.usersKey, JSON.stringify(users));
+
+    return null;
   }
 
-  login(data: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, data);
-  }
+  login(data: LoginData): string | null {
+    const users = this.loadUsers();
 
-  saveToken(token: string): void {
-    localStorage.setItem('authToken', token);
-  }
+    const foundUser = users.find(
+      (user) =>
+        user.email.toLowerCase() === data.email.toLowerCase() && user.password === data.password,
+    );
 
-  getToken(): string | null {
-    return localStorage.getItem('authToken');
+    if (!foundUser) {
+      return 'Email or password is wrong.';
+    }
+
+    localStorage.setItem(this.currentUserKey, JSON.stringify(foundUser));
+    this.currentUserSignal.set(foundUser);
+
+    return null;
   }
 
   logout(): void {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem(this.currentUserKey);
+    this.currentUserSignal.set(null);
   }
 
-  isLoggedIn(): boolean {
-    return this.getToken() !== null;
+  private loadUsers(): AppUser[] {
+    const rawUsers = localStorage.getItem(this.usersKey);
+
+    if (!rawUsers) {
+      return [];
+    }
+
+    return JSON.parse(rawUsers) as AppUser[];
+  }
+
+  private loadCurrentUser(): AppUser | null {
+    const rawUser = localStorage.getItem(this.currentUserKey);
+
+    if (!rawUser) {
+      return null;
+    }
+
+    return JSON.parse(rawUser) as AppUser;
   }
 }

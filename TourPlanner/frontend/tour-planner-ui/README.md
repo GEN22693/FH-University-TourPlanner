@@ -1,59 +1,48 @@
-# TourPlannerUi
+# Tour Planner Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.8.
+Tour Planner is an Angular frontend application for planning and managing personal tours.
+This version is prepared for the intermediate submission and focuses on the frontend part of the project.
 
-## Development server
+The application allows users to register, log in, create tours, view tour details, manage tour logs and display an interactive map using Leaflet.
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## Tech Stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Angular
+- TypeScript
+- Tailwind CSS
+- Angular Signals
+- Angular Standalone Components
+- Angular Router
+- Leaflet
+- OpenStreetMap tiles
+- LocalStorage
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Project Status
 
-```bash
-ng generate component component-name
-```
+This is the frontend version for the intermediate submission.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+There is currently no backend connection.
+All data is stored locally in the browser using `localStorage`.
 
-```bash
-ng generate --help
-```
+This includes:
 
-## Building
+- registered users
+- current logged-in user
+- tours
+- tour logs
 
-To build the project run:
+The project is structured so that the local storage logic is separated into services.
+This makes it easier to replace the local storage implementation with real backend API calls later.
 
-```bash
-ng build
-```
+---
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## How to Start the Project
 
-## Running unit tests
+Open a terminal in the frontend project folder:
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```powershell
+cd TourPlanner/frontend/tour-planner-ui

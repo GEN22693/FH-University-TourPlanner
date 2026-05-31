@@ -1,8 +1,76 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@font-face {
+  font-family: "TourFont";
+  src: url("/fonts/Jthin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TourFont";
+  src: url("/fonts/Jlight.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TourFont";
+  src: url("/fonts/Jregular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TourFont";
+  src: url("/fonts/Jsbold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TourFont";
+  src: url("/fonts/Jbold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TourFont";
+  src: url("/fonts/bold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 html,
 body {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   margin: 0;
+  font-family: "TourFont", system-ui, sans-serif;
+  background: #f2eee5;
+  color: #171717;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+.leaflet-container {
+  font-family: "TourFont", system-ui, sans-serif;
+  background: #1b211d;
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
 }

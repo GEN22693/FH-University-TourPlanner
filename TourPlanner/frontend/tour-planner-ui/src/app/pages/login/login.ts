@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+
+import { AuthService } from '../../core/services/auth.service';
+import { LoginData } from '../../models/auth.model';
 
 @Component({
   selector: 'app-login',
@@ -8,21 +11,33 @@ import { RouterLink } from '@angular/router';
   templateUrl: './login.html',
 })
 export class Login {
-  email = 'user@example.at';
-  password = 'password123';
-  errorMessage = '';
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  readonly email = signal('');
+  readonly password = signal('');
+  readonly errorMessage = signal('');
 
   signIn(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
 
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Please enter email and password.';
+    const loginData: LoginData = {
+      email: this.email().trim(),
+      password: this.password(),
+    };
+
+    if (!loginData.email || !loginData.password) {
+      this.errorMessage.set('Please enter email and password.');
       return;
     }
 
-    console.log('Login data:', {
-      email: this.email,
-      password: this.password,
-    });
+    const error = this.authService.login(loginData);
+
+    if (error) {
+      this.errorMessage.set(error);
+      return;
+    }
+
+    this.router.navigate(['/tours']);
   }
 }
