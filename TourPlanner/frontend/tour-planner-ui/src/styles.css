@@ -1,52 +1,83 @@
-@import "tailwindcss";
-@import "leaflet/dist/leaflet.css";
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
 
 @font-face {
-  font-family: "TourFont";
-  src: url("/fonts/Jthin.ttf") format("truetype");
+  font-family: 'TourFont';
+  src: url('/fonts/Jthin.ttf') format('truetype');
   font-weight: 100;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "TourFont";
-  src: url("/fonts/Jlight.ttf") format("truetype");
+  font-family: 'TourFont';
+  src: url('/fonts/Jlight.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "TourFont";
-  src: url("/fonts/Jregular.ttf") format("truetype");
+  font-family: 'TourFont';
+  src: url('/fonts/Jregular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "TourFont";
-  src: url("/fonts/Jsbold.ttf") format("truetype");
+  font-family: 'TourFont';
+  src: url('/fonts/Jsbold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "TourFont";
-  src: url("/fonts/Jbold.ttf") format("truetype");
+  font-family: 'TourFont';
+  src: url('/fonts/Jbold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "TourFont";
-  src: url("/fonts/bold.ttf") format("truetype");
+  font-family: 'TourFont';
+  src: url('/fonts/bold.ttf') format('truetype');
   font-weight: 800;
   font-style: normal;
   font-display: swap;
+}
+
+:root {
+  --page: #f3f0e8;
+  --page-soft: #f8f6f1;
+
+  --surface: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.74);
+  --surface-warm: rgba(255, 252, 246, 0.78);
+
+  --ink: #1d1d1f;
+  --muted: #6e6e73;
+  --muted-soft: #8b8b91;
+
+  --line: rgba(29, 29, 31, 0.08);
+  --line-soft: rgba(29, 29, 31, 0.052);
+
+  --accent: #4f7cff;
+  --accent-soft: rgba(79, 124, 255, 0.12);
+
+  --sand: #d7a86e;
+  --sand-soft: rgba(215, 168, 110, 0.18);
+
+  --sage: #7a9f7a;
+  --sage-soft: rgba(122, 159, 122, 0.14);
+
+  --clay: #c98262;
+  --clay-soft: rgba(201, 130, 98, 0.12);
+
+  --shadow-soft: 0 24px 70px rgba(29, 29, 31, 0.085);
+  --shadow-card: 0 20px 56px rgba(29, 29, 31, 0.06);
 }
 
 html,
@@ -54,23 +85,153 @@ body {
   width: 100%;
   min-height: 100%;
   margin: 0;
-  font-family: "TourFont", system-ui, sans-serif;
-  background: #f2eee5;
-  color: #171717;
+  font-family:
+    'TourFont',
+    -apple-system,
+    BlinkMacSystemFont,
+    'SF Pro Display',
+    'SF Pro Text',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 50% -18rem, rgba(255, 255, 255, 0.98), transparent 35rem),
+    radial-gradient(circle at 96% 12%, rgba(220, 232, 247, 0.78), transparent 35rem),
+    radial-gradient(circle at 5% 92%, rgba(234, 223, 206, 0.92), transparent 37rem),
+    radial-gradient(circle at 48% 48%, rgba(244, 217, 180, 0.34), transparent 30rem),
+    radial-gradient(circle at 76% 82%, rgba(122, 159, 122, 0.1), transparent 24rem),
+    linear-gradient(180deg, #fbfaf7 0%, #f3f0e8 46%, #ede8de 100%);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 button,
 input,
 textarea,
 select {
-  font-family: inherit;
+  font-family:
+    'TourFont',
+    -apple-system,
+    BlinkMacSystemFont,
+    'SF Pro Display',
+    'SF Pro Text',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+
+button {
+  cursor: pointer;
+}
+
+input,
+textarea,
+select,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(79, 124, 255, 0.18);
+  color: #1d1d1f;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f0e8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(29, 29, 31, 0.18);
+  border: 4px solid #f3f0e8;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(29, 29, 31, 0.28);
 }
 
 .leaflet-container {
-  font-family: "TourFont", system-ui, sans-serif;
-  background: #1b211d;
+  font-family:
+    'TourFont',
+    -apple-system,
+    BlinkMacSystemFont,
+    'SF Pro Display',
+    'SF Pro Text',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(220, 232, 247, 0.48), transparent 24rem),
+    radial-gradient(circle at 80% 80%, rgba(234, 223, 206, 0.55), transparent 26rem), #ebe6dc;
+  color: #1d1d1f;
 }
 
 .leaflet-control-attribution {
+  border-radius: 999px 0 0 0;
+  background: rgba(255, 255, 255, 0.8) !important;
+  color: rgba(29, 29, 31, 0.5) !important;
   font-size: 10px;
+  backdrop-filter: blur(18px);
+}
+
+.leaflet-control-attribution a {
+  color: rgba(29, 29, 31, 0.66) !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid rgba(29, 29, 31, 0.08) !important;
+  border-radius: 18px !important;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(29, 29, 31, 0.11) !important;
+  backdrop-filter: blur(18px);
+}
+
+.leaflet-control-zoom a {
+  width: 38px !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.84) !important;
+  color: #1d1d1f !important;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+  transform: translateY(-1px);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #1d1d1f !important;
+  border: 1px solid rgba(29, 29, 31, 0.08);
+  box-shadow: 0 28px 80px rgba(29, 29, 31, 0.15);
+  backdrop-filter: blur(22px);
+}
+
+.leaflet-popup-content {
+  color: #6e6e73;
+}
+
+.leaflet-popup-close-button {
+  color: rgba(29, 29, 31, 0.5) !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: #1d1d1f !important;
 }

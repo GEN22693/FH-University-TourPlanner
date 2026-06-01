@@ -27,4 +27,8 @@ export const routes: Routes = [
     path: 'tours/:id',
     component: TourDetail,
   },
+  {
+    path: '**',
+    redirectTo: 'login',
+  },
 ];

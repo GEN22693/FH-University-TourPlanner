@@ -7,10 +7,11 @@ import { TourService } from '../../core/services/tour.service';
 import { Tour, TransportType } from '../../models/tour.model';
 import { TourLog } from '../../models/tour-log.model';
 import { MapPlaceholder } from '../../shared/components/map-placeholder/map-placeholder';
+import { Navbar } from '../../shared/components/navbar/navbar';
 
 @Component({
   selector: 'app-tour-detail',
-  imports: [FormsModule, RouterLink, MapPlaceholder],
+  imports: [FormsModule, RouterLink, MapPlaceholder, Navbar],
   templateUrl: './tour-detail.html',
 })
 export class TourDetail {
@@ -27,11 +28,15 @@ export class TourDetail {
   readonly tour = computed(() => this.tourService.getTourById(this.tourId()));
   readonly logs = computed(() => this.tourService.getLogsByTour(this.tourId()));
 
+  readonly isEditTourModalOpen = signal(false);
+  readonly isLogModalOpen = signal(false);
+
   readonly name = signal('');
   readonly description = signal('');
   readonly from = signal('');
   readonly to = signal('');
   readonly transportType = signal<TransportType>('Bike');
+  readonly plannedDate = signal(new Date().toISOString().slice(0, 10));
   readonly tourErrorMessage = signal('');
 
   readonly logDate = signal(new Date().toISOString().slice(0, 16));
@@ -43,6 +48,26 @@ export class TourDetail {
   readonly logErrorMessage = signal('');
   readonly editingLogId = signal<string | null>(null);
 
+  readonly averageRating = computed(() => {
+    const tourLogs = this.logs();
+
+    if (tourLogs.length === 0) {
+      return 0;
+    }
+
+    const sum = tourLogs.reduce((total, log) => total + log.rating, 0);
+
+    return Math.round((sum / tourLogs.length) * 10) / 10;
+  });
+
+  readonly totalLoggedDistance = computed(() =>
+    this.logs().reduce((total, log) => total + log.totalDistance, 0),
+  );
+
+  readonly totalLoggedTime = computed(() =>
+    this.logs().reduce((total, log) => total + log.totalTime, 0),
+  );
+
   constructor() {
     const selectedTour = this.tour();
 
@@ -52,7 +77,30 @@ export class TourDetail {
       this.from.set(selectedTour.from);
       this.to.set(selectedTour.to);
       this.transportType.set(selectedTour.transportType);
+      this.plannedDate.set(selectedTour.plannedDate || new Date().toISOString().slice(0, 10));
     }
+  }
+
+  openEditTourModal(): void {
+    const selectedTour = this.tour();
+
+    if (!selectedTour) {
+      return;
+    }
+
+    this.tourErrorMessage.set('');
+    this.name.set(selectedTour.name);
+    this.description.set(selectedTour.description);
+    this.from.set(selectedTour.from);
+    this.to.set(selectedTour.to);
+    this.transportType.set(selectedTour.transportType);
+    this.plannedDate.set(selectedTour.plannedDate || new Date().toISOString().slice(0, 10));
+    this.isEditTourModalOpen.set(true);
+  }
+
+  closeEditTourModal(): void {
+    this.tourErrorMessage.set('');
+    this.isEditTourModalOpen.set(false);
   }
 
   saveTour(): void {
@@ -65,21 +113,39 @@ export class TourDetail {
       return;
     }
 
-    if (!this.name().trim() || !this.from().trim() || !this.to().trim()) {
-      this.tourErrorMessage.set('Name, from and to are required.');
+    const updatedName = this.name().trim();
+    const updatedFrom = this.from().trim();
+    const updatedTo = this.to().trim();
+    const updatedDate = this.plannedDate();
+
+    if (!updatedName || !updatedFrom || !updatedTo || !updatedDate) {
+      this.tourErrorMessage.set('Name, date, from and destination are required.');
       return;
     }
 
     const updatedTour: Tour = {
       ...selectedTour,
-      name: this.name().trim(),
+      name: updatedName,
       description: this.description().trim(),
-      from: this.from().trim(),
-      to: this.to().trim(),
+      from: updatedFrom,
+      to: updatedTo,
       transportType: this.transportType(),
+      plannedDate: updatedDate,
     };
 
     this.tourService.updateTour(updatedTour);
+    this.closeEditTourModal();
+  }
+
+  openNewLogModal(): void {
+    this.resetLogForm();
+    this.isLogModalOpen.set(true);
+  }
+
+  closeLogModal(): void {
+    this.logErrorMessage.set('');
+    this.isLogModalOpen.set(false);
+    this.resetLogForm();
   }
 
   saveLog(): void {
@@ -129,7 +195,7 @@ export class TourDetail {
       };
 
       this.tourService.updateTourLog(updatedLog);
-      this.resetLogForm();
+      this.closeLogModal();
       return;
     }
 
@@ -144,7 +210,7 @@ export class TourDetail {
       rating: this.logRating(),
     });
 
-    this.resetLogForm();
+    this.closeLogModal();
   }
 
   editLog(log: TourLog): void {
@@ -155,6 +221,8 @@ export class TourDetail {
     this.logDistance.set(log.totalDistance);
     this.logTime.set(log.totalTime);
     this.logRating.set(log.rating);
+    this.logErrorMessage.set('');
+    this.isLogModalOpen.set(true);
   }
 
   deleteLog(logId: string): void {
@@ -171,8 +239,30 @@ export class TourDetail {
     }
   }
 
-  cancelLogEdit(): void {
-    this.resetLogForm();
+  setTransportType(value: string): void {
+    this.transportType.set(value as TransportType);
+  }
+
+  formatDate(date: string | undefined): string {
+    if (!date) {
+      return 'No date';
+    }
+
+    return new Intl.DateTimeFormat('en', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date(date));
+  }
+
+  formatDateTime(date: string): string {
+    return new Intl.DateTimeFormat('en', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(date));
   }
 
   private resetLogForm(): void {

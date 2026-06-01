@@ -5,10 +5,11 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TourService } from '../../core/services/tour.service';
 import { Tour, TransportType } from '../../models/tour.model';
+import { Navbar } from '../../shared/components/navbar/navbar';
 
 @Component({
   selector: 'app-tourlist',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, Navbar],
   templateUrl: './tourlist.html',
 })
 export class Tourlist {
@@ -17,6 +18,8 @@ export class Tourlist {
   private readonly router = inject(Router);
 
   readonly currentUser = this.authService.currentUser;
+
+  readonly isCreateModalOpen = signal(false);
 
   readonly name = signal('');
   readonly description = signal('');
@@ -61,6 +64,14 @@ export class Tourlist {
     );
   });
 
+  readonly nextTour = computed(() => {
+    const today = new Date().toISOString().slice(0, 10);
+
+    return this.userTours()
+      .filter((tour) => tour.plannedDate && tour.plannedDate >= today)
+      .sort((a, b) => (a.plannedDate || '').localeCompare(b.plannedDate || ''))[0];
+  });
+
   readonly upcomingTours = computed(() => {
     const today = new Date().toISOString().slice(0, 10);
 
@@ -70,6 +81,20 @@ export class Tourlist {
   readonly totalDistance = computed(() =>
     this.userTours().reduce((sum, tour) => sum + tour.distance, 0),
   );
+
+  readonly totalEstimatedTime = computed(() =>
+    this.userTours().reduce((sum, tour) => sum + tour.estimatedTime, 0),
+  );
+
+  openCreateModal(): void {
+    this.errorMessage.set('');
+    this.isCreateModalOpen.set(true);
+  }
+
+  closeCreateModal(): void {
+    this.errorMessage.set('');
+    this.isCreateModalOpen.set(false);
+  }
 
   addTour(): void {
     this.errorMessage.set('');
@@ -87,7 +112,7 @@ export class Tourlist {
     const date = this.plannedDate();
 
     if (!tourName || !tourFrom || !tourTo || !date) {
-      this.errorMessage.set('Name, date, from and to are required.');
+      this.errorMessage.set('Name, date, from and destination are required.');
       return;
     }
 
@@ -105,6 +130,7 @@ export class Tourlist {
     });
 
     this.resetForm();
+    this.closeCreateModal();
   }
 
   deleteTour(tourId: string): void {
@@ -117,18 +143,13 @@ export class Tourlist {
     this.tourService.deleteTour(tourId);
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
-
   setTransportType(value: string): void {
     this.transportType.set(value as TransportType);
   }
 
   formatDate(date: string | undefined): string {
     if (!date) {
-      return 'Not scheduled';
+      return 'No date';
     }
 
     return new Intl.DateTimeFormat('en', {
@@ -140,31 +161,25 @@ export class Tourlist {
 
   getTransportLabel(type: TransportType): string {
     if (type === 'Bike') {
-      return 'Cycling route';
+      return 'Cycling';
     }
 
     if (type === 'Hike') {
-      return 'Mountain path';
+      return 'Hiking';
     }
 
     if (type === 'Run') {
-      return 'Running track';
+      return 'Running';
     }
 
-    return 'Travel itinerary';
-  }
-
-  getCoverNumber(tour: Tour): string {
-    const number = tour.name.length + tour.from.length + tour.to.length + tour.distance;
-
-    return String(number).slice(-2).padStart(2, '0');
+    return 'Travel';
   }
 
   getRouteInitials(tour: Tour): string {
     const start = tour.from.trim().charAt(0).toUpperCase() || 'A';
     const end = tour.to.trim().charAt(0).toUpperCase() || 'B';
 
-    return `${start} → ${end}`;
+    return `${start}${end}`;
   }
 
   private resetForm(): void {

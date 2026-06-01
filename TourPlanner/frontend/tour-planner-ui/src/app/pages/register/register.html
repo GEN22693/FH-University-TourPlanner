@@ -1,235 +1,238 @@
-<section class="min-h-dvh bg-[#f2eee5] px-4 py-5 text-[#171717] sm:px-6 lg:px-8">
+<section class="relative min-h-dvh overflow-hidden bg-[#f6f4ef] text-[#1d1d1f]">
+  <div class="pointer-events-none absolute inset-0">
+    <div
+      class="absolute left-1/2 top-[-24rem] h-[48rem] w-[48rem] -translate-x-1/2 rounded-full bg-white blur-3xl"
+    ></div>
+
+    <div
+      class="absolute right-[-14rem] top-[12%] h-[38rem] w-[38rem] rounded-full bg-[#dfe8f7]/80 blur-3xl"
+    ></div>
+
+    <div
+      class="absolute bottom-[-18rem] left-[-12rem] h-[40rem] w-[40rem] rounded-full bg-[#eadfce]/80 blur-3xl"
+    ></div>
+
+    <div
+      class="absolute left-[44%] top-[42%] h-[26rem] w-[26rem] rounded-full bg-[#f3ddc1]/35 blur-3xl"
+    ></div>
+  </div>
+
   <div
-    class="mx-auto flex min-h-[calc(100dvh-2.5rem)] w-full max-w-[1540px] items-center justify-center"
-  >
-    <main
-      class="grid w-full overflow-hidden rounded-[2.25rem] border border-[#d8d0c2] bg-[#fbfaf7] shadow-[0_40px_120px_rgba(24,20,15,0.16)] lg:min-h-[760px] lg:grid-cols-[0.92fr_1.08fr]"
-    >
-      <aside class="relative hidden overflow-hidden bg-[#151515] text-white lg:block">
+    class="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.72),rgba(255,255,255,0.18)_45%,rgba(255,255,255,0.58))]"
+  ></div>
+
+  <div class="relative mx-auto flex min-h-dvh w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-10">
+    <header class="flex items-center justify-between">
+      <a routerLink="/" class="inline-flex items-center gap-3">
         <div
-          class="absolute inset-0 bg-[radial-gradient(circle_at_18%_14%,rgba(194,138,67,0.28),transparent_30%),radial-gradient(circle_at_90%_82%,rgba(91,107,74,0.35),transparent_34%)]"
-        ></div>
-        <div
-          class="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06)_0.5px,transparent_0.5px)] bg-[size:26px_26px] opacity-[0.08]"
-        ></div>
-
-        <div class="relative z-10 flex h-full flex-col justify-between p-10 xl:p-12">
-          <header class="flex items-center justify-between gap-5">
-            <div class="flex items-center gap-4">
-              <div
-                class="grid h-12 w-12 place-items-center rounded-full bg-[#c28a43] text-sm font-extrabold text-[#151515] shadow-[0_12px_30px_rgba(194,138,67,0.22)]"
-              >
-                TP
-              </div>
-
-              <div>
-                <p class="text-xl font-extrabold tracking-[-0.03em] text-white">Tour Planner</p>
-                <p class="mt-1 text-xs font-semibold tracking-wide text-white/55">
-                  Private route workspace
-                </p>
-              </div>
-            </div>
-
-            <div
-              class="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-bold text-white/60 backdrop-blur-xl"
-            >
-              New workspace
-            </div>
-          </header>
-
-          <section class="max-w-[35rem]">
-            <p class="mb-5 text-xs font-extrabold uppercase tracking-[0.34em] text-[#d9a15b]">
-              Begin organized
-            </p>
-
-            <h1
-              class="text-[clamp(3.25rem,5.1vw,5.95rem)] font-extrabold leading-[0.9] tracking-[-0.075em] text-white"
-            >
-              Create your private travel system.
-            </h1>
-
-            <p class="mt-7 max-w-[30rem] text-[0.98rem] font-medium leading-8 text-white/68">
-              Start with a refined workspace for routes, logs and future route statistics.
-            </p>
-          </section>
-
-          <section
-            class="rounded-[2rem] border border-white/10 bg-white/[0.075] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.25)] backdrop-blur-2xl"
-          >
-            <div class="mb-5 flex items-center justify-between gap-5">
-              <div>
-                <p class="text-sm font-extrabold text-white">Workspace flow</p>
-                <p class="mt-1 text-xs font-semibold text-white/50">
-                  Simple structure, clear ownership
-                </p>
-              </div>
-
-              <span
-                class="rounded-full bg-[#f2eee5] px-4 py-2 text-xs font-extrabold text-[#151515]"
-              >
-                Private
-              </span>
-            </div>
-
-            <div class="grid gap-3">
-              <div class="flex items-center gap-4 rounded-2xl bg-white/[0.08] p-4">
-                <div
-                  class="grid h-10 w-10 place-items-center rounded-full bg-[#c28a43] text-sm font-extrabold text-[#151515]"
-                >
-                  1
-                </div>
-
-                <div>
-                  <p class="text-sm font-extrabold text-white">Create account</p>
-                  <p class="mt-1 text-xs font-semibold text-white/45">
-                    Open your personal route workspace.
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-4 rounded-2xl bg-white/[0.08] p-4">
-                <div
-                  class="grid h-10 w-10 place-items-center rounded-full bg-[#f2eee5] text-sm font-extrabold text-[#151515]"
-                >
-                  2
-                </div>
-
-                <div>
-                  <p class="text-sm font-extrabold text-white">Plan tours</p>
-                  <p class="mt-1 text-xs font-semibold text-white/45">
-                    Store routes, transport type and estimates.
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-4 rounded-2xl bg-white/[0.08] p-4">
-                <div
-                  class="grid h-10 w-10 place-items-center rounded-full bg-[#5b6b4a] text-sm font-extrabold text-white"
-                >
-                  3
-                </div>
-
-                <div>
-                  <p class="text-sm font-extrabold text-white">Track logs</p>
-                  <p class="mt-1 text-xs font-semibold text-white/45">
-                    Keep every completed tour documented.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-      </aside>
-
-      <section
-        class="relative flex min-h-[calc(100dvh-2.5rem)] items-center justify-center px-6 py-10 sm:px-10 lg:min-h-full lg:px-16"
-      >
-        <div
-          class="absolute right-8 top-8 hidden rounded-full border border-[#ded6c8] bg-white/70 px-4 py-2 text-xs font-bold text-[#6f675c] shadow-sm sm:block"
+          class="grid h-10 w-10 place-items-center rounded-2xl border border-black/[0.06] bg-white/80 shadow-[0_14px_34px_rgba(29,29,31,0.07)] backdrop-blur-xl"
         >
-          Private account
+          <span class="text-[11px] font-bold tracking-[-0.03em] text-[#1d1d1f]">TP</span>
         </div>
 
-        <div class="w-full max-w-[27rem]">
-          <div class="mb-10 flex items-center gap-4 lg:hidden">
-            <div
-              class="grid h-12 w-12 place-items-center rounded-full bg-[#151515] text-sm font-extrabold text-[#d9a15b]"
-            >
-              TP
-            </div>
+        <div>
+          <p class="text-sm font-bold tracking-[-0.03em] text-[#1d1d1f]">Tour Planner</p>
+          <p class="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b8b91]">
+            Private routes
+          </p>
+        </div>
+      </a>
 
-            <div>
-              <p class="text-xl font-extrabold tracking-[-0.03em]">Tour Planner</p>
-              <p class="mt-1 text-xs font-semibold text-[#746d63]">Private route workspace</p>
+      <a
+        routerLink="/login"
+        class="hidden rounded-full border border-black/[0.06] bg-white/72 px-4 py-2 text-xs font-semibold text-[#424245] shadow-[0_12px_34px_rgba(29,29,31,0.055)] backdrop-blur-xl transition hover:bg-white hover:text-[#1d1d1f] sm:inline-flex"
+      >
+        Sign in
+      </a>
+    </header>
+
+    <main class="grid flex-1 items-center gap-14 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:py-8">
+      <section class="flex justify-center lg:justify-start">
+        <div class="w-full max-w-[27rem]">
+          <div
+            class="rounded-[2.35rem] border border-white/70 bg-white/52 p-2 shadow-[0_38px_110px_rgba(29,29,31,0.11)] backdrop-blur-2xl"
+          >
+            <div
+              class="relative overflow-hidden rounded-[1.95rem] border border-black/[0.045] bg-white/88 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] sm:p-8"
+            >
+              <div
+                class="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#d7a86e]/55 to-transparent"
+              ></div>
+
+              <div
+                class="pointer-events-none absolute right-[-5rem] top-[-5rem] h-40 w-40 rounded-full bg-[#eadfce]/80 blur-3xl"
+              ></div>
+
+              <div class="relative">
+                <div class="mb-9">
+                  <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#8b8b91]">
+                    Start fresh
+                  </p>
+
+                  <h2
+                    class="mt-4 text-4xl font-bold tracking-[-0.075em] text-[#1d1d1f] sm:text-5xl"
+                  >
+                    Create account
+                  </h2>
+
+                  <p class="mt-4 text-sm leading-6 text-[#6e6e73]">
+                    Build your private workspace for routes, maps and personal travel history.
+                  </p>
+                </div>
+
+                <form class="space-y-4" (ngSubmit)="createAccount()">
+                  <label class="block">
+                    <span
+                      class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b8b91]"
+                    >
+                      Username
+                    </span>
+
+                    <input
+                      class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#f6f4ef]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition placeholder:text-[#a1a1a6] hover:border-black/[0.12] hover:bg-white focus:border-[#d7a86e]/45 focus:bg-white focus:ring-4 focus:ring-[#d7a86e]/12"
+                      type="text"
+                      name="username"
+                      [ngModel]="username()"
+                      (ngModelChange)="username.set($event)"
+                      placeholder="danial"
+                      autocomplete="username"
+                    />
+                  </label>
+
+                  <label class="block">
+                    <span
+                      class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b8b91]"
+                    >
+                      Email
+                    </span>
+
+                    <input
+                      class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#f6f4ef]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition placeholder:text-[#a1a1a6] hover:border-black/[0.12] hover:bg-white focus:border-[#4f7cff]/35 focus:bg-white focus:ring-4 focus:ring-[#4f7cff]/10"
+                      type="email"
+                      name="email"
+                      [ngModel]="email()"
+                      (ngModelChange)="email.set($event)"
+                      placeholder="you@example.com"
+                      autocomplete="email"
+                    />
+                  </label>
+
+                  <label class="block">
+                    <span
+                      class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b8b91]"
+                    >
+                      Password
+                    </span>
+
+                    <input
+                      class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#f6f4ef]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition placeholder:text-[#a1a1a6] hover:border-black/[0.12] hover:bg-white focus:border-[#7a9f7a]/40 focus:bg-white focus:ring-4 focus:ring-[#7a9f7a]/10"
+                      type="password"
+                      name="password"
+                      [ngModel]="password()"
+                      (ngModelChange)="password.set($event)"
+                      placeholder="Minimum 6 characters"
+                      autocomplete="new-password"
+                    />
+                  </label>
+
+                  @if (errorMessage()) {
+                    <div class="rounded-2xl border border-red-500/10 bg-red-50 px-4 py-3">
+                      <p class="text-sm font-semibold leading-6 text-red-600">
+                        {{ errorMessage() }}
+                      </p>
+                    </div>
+                  }
+
+                  <button
+                    class="group mt-2 flex h-14 w-full items-center justify-center rounded-2xl bg-[#1d1d1f] px-5 text-xs font-bold uppercase tracking-[0.18em] text-white shadow-[0_18px_45px_rgba(29,29,31,0.18)] transition hover:-translate-y-0.5 hover:bg-black hover:shadow-[0_24px_58px_rgba(29,29,31,0.24)] active:translate-y-0"
+                    type="submit"
+                  >
+                    Create workspace
+                    <span class="ml-2 transition group-hover:translate-x-0.5">→</span>
+                  </button>
+                </form>
+
+                <div class="mt-7 flex items-center justify-between gap-4 text-sm">
+                  <p class="text-[#8b8b91]">Already registered?</p>
+
+                  <a
+                    routerLink="/login"
+                    class="font-bold text-[#1d1d1f] transition hover:text-[#4f7cff]"
+                  >
+                    Sign in
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 
-          <p class="text-xs font-extrabold uppercase tracking-[0.32em] text-[#b87e37]">
-            New account
+          <p class="mt-5 text-center text-xs leading-6 text-[#8b8b91]">
+            Private planning starts with a clean workspace.
           </p>
+        </div>
+      </section>
 
-          <h2
-            class="mt-4 text-[clamp(2.6rem,5vw,4.4rem)] font-extrabold leading-[0.95] tracking-[-0.065em] text-[#171717]"
+      <section class="max-w-3xl lg:ml-auto">
+        <div
+          class="mb-7 inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/70 px-3 py-2 shadow-[0_12px_34px_rgba(29,29,31,0.055)] backdrop-blur-xl"
+        >
+          <span class="relative flex h-2 w-2">
+            <span
+              class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#d7a86e]/35"
+            ></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-[#d7a86e]"></span>
+          </span>
+
+          <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b8b91]">
+            New private workspace
+          </span>
+        </div>
+
+        <h1
+          class="max-w-4xl text-[clamp(3.4rem,7.4vw,7.8rem)] font-bold leading-[0.88] tracking-[-0.085em] text-[#1d1d1f]"
+        >
+          Start clean.
+          <br />
+          Travel better.
+        </h1>
+
+        <p class="mt-8 max-w-xl text-base font-normal leading-8 text-[#6e6e73] sm:text-lg">
+          Create a quiet place for your routes, saved trips and personal travel structure — simple,
+          polished and built without visual noise.
+        </p>
+
+        <div class="mt-12 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3">
+          <div
+            class="group rounded-[1.75rem] border border-black/[0.06] bg-white/72 p-5 shadow-[0_20px_56px_rgba(29,29,31,0.055)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white hover:shadow-[0_28px_70px_rgba(29,29,31,0.08)]"
           >
-            Register.
-          </h2>
+            <div class="mb-5 h-1 w-8 rounded-full bg-[#d7a86e]/80"></div>
 
-          <p class="mt-5 max-w-sm text-[0.95rem] font-medium leading-7 text-[#6d655c]">
-            Create your workspace and start organizing your tours with clarity.
-          </p>
+            <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b8b91]">
+              Create
+            </p>
 
-          <form class="mt-9 space-y-4" (ngSubmit)="createAccount()">
-            <label class="block">
-              <span class="text-xs font-extrabold uppercase tracking-[0.08em] text-[#5f574d]"
-                >Username</span
-              >
-              <input
-                class="mt-2 w-full rounded-2xl border border-[#ddd4c6] bg-[#f7f3eb] px-5 py-3.5 text-sm font-bold text-[#171717] outline-none transition placeholder:text-[#9d9488] focus:border-[#b87e37] focus:bg-white focus:ring-4 focus:ring-[#b87e37]/10"
-                type="text"
-                name="username"
-                [ngModel]="username()"
-                (ngModelChange)="username.set($event)"
-                placeholder="Username"
-              />
-            </label>
+            <p class="mt-4 text-2xl font-bold tracking-[-0.06em] text-[#1d1d1f]">Profile</p>
+          </div>
 
-            <label class="block">
-              <span class="text-xs font-extrabold uppercase tracking-[0.08em] text-[#5f574d]"
-                >Email address</span
-              >
-              <input
-                class="mt-2 w-full rounded-2xl border border-[#ddd4c6] bg-[#f7f3eb] px-5 py-3.5 text-sm font-bold text-[#171717] outline-none transition placeholder:text-[#9d9488] focus:border-[#b87e37] focus:bg-white focus:ring-4 focus:ring-[#b87e37]/10"
-                type="email"
-                name="email"
-                [ngModel]="email()"
-                (ngModelChange)="email.set($event)"
-                placeholder="user@example.at"
-              />
-            </label>
+          <div
+            class="group rounded-[1.75rem] border border-black/[0.06] bg-white/72 p-5 shadow-[0_20px_56px_rgba(29,29,31,0.055)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white hover:shadow-[0_28px_70px_rgba(29,29,31,0.08)]"
+          >
+            <div class="mb-5 h-1 w-8 rounded-full bg-[#4f7cff]/80"></div>
 
-            <label class="block">
-              <span class="text-xs font-extrabold uppercase tracking-[0.08em] text-[#5f574d]"
-                >Password</span
-              >
-              <input
-                class="mt-2 w-full rounded-2xl border border-[#ddd4c6] bg-[#f7f3eb] px-5 py-3.5 text-sm font-bold text-[#171717] outline-none transition placeholder:text-[#9d9488] focus:border-[#b87e37] focus:bg-white focus:ring-4 focus:ring-[#b87e37]/10"
-                type="password"
-                name="password"
-                [ngModel]="password()"
-                (ngModelChange)="password.set($event)"
-                placeholder="minimum 6 characters"
-              />
-            </label>
+            <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b8b91]">Plan</p>
 
-            @if (errorMessage()) {
-              <p
-                class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-600"
-              >
-                {{ errorMessage() }}
-              </p>
-            }
+            <p class="mt-4 text-2xl font-bold tracking-[-0.06em] text-[#1d1d1f]">Routes</p>
+          </div>
 
-            <button
-              class="group relative w-full overflow-hidden rounded-2xl bg-[#171717] px-5 py-3.5 text-sm font-extrabold uppercase tracking-[0.04em] text-white shadow-[0_18px_44px_rgba(23,23,23,0.18)] transition hover:-translate-y-0.5 active:translate-y-0"
-              type="submit"
-            >
-              <span
-                class="absolute inset-y-0 left-0 w-0 bg-[#b87e37] transition-all duration-300 group-hover:w-full"
-              ></span>
-              <span class="relative">Create account</span>
-            </button>
+          <div
+            class="group rounded-[1.75rem] border border-black/[0.06] bg-white/72 p-5 shadow-[0_20px_56px_rgba(29,29,31,0.055)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white hover:shadow-[0_28px_70px_rgba(29,29,31,0.08)]"
+          >
+            <div class="mb-5 h-1 w-8 rounded-full bg-[#7a9f7a]/80"></div>
 
-            <a
-              class="flex w-full items-center justify-center rounded-2xl border border-[#ddd4c6] bg-white px-5 py-3.5 text-sm font-extrabold uppercase tracking-[0.04em] text-[#171717] transition hover:border-[#b87e37]/50 hover:bg-[#f7f3eb]"
-              routerLink="/login"
-            >
-              Back to login
-            </a>
-          </form>
+            <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b8b91]">Save</p>
 
-          <p class="mt-8 text-xs font-semibold leading-5 text-[#8b8378]">
-            Your tours and logs stay connected to your private account.
-          </p>
+            <p class="mt-4 text-2xl font-bold tracking-[-0.06em] text-[#1d1d1f]">History</p>
+          </div>
         </div>
       </section>
     </main>

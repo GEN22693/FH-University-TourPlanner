@@ -1,55 +1,16 @@
 <section
-  class="overflow-hidden rounded-[2rem] border border-[#d8d0c2] bg-[#151515] shadow-[0_24px_70px_rgba(24,20,15,0.18)]"
+  class="overflow-hidden rounded-[2rem] border border-black/[0.075] bg-[#d8d1c4] shadow-[0_32px_90px_rgba(29,29,31,0.14)]"
 >
-  <div class="relative p-5 sm:p-6">
+  <div class="relative h-[23rem] overflow-hidden sm:h-[30rem] lg:h-[34rem]">
+    <div #mapContainer class="absolute inset-0 z-0 h-full w-full"></div>
+
     <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_18%_25%,rgba(194,138,67,0.22),transparent_30%),radial-gradient(circle_at_88%_78%,rgba(91,107,74,0.24),transparent_34%)]"
-    ></div>
-
-    <div class="relative z-10">
-      <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p class="text-xs font-extrabold uppercase tracking-[0.28em] text-[#d9a15b]">
-            Interactive map
-          </p>
-
-          <h3 class="mt-2 text-2xl font-extrabold tracking-[-0.06em] text-white">
-            {{ from() }} → {{ to() }}
-          </h3>
-        </div>
-
-        <span
-          class="w-fit rounded-full bg-[#f2eee5] px-4 py-2 text-xs font-extrabold text-[#151515]"
-        >
-          {{ transportType() }}
-        </span>
-      </div>
-
-      <div class="overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#1b211d]">
-        <div #mapContainer class="h-[22rem] w-full sm:h-[26rem] lg:h-[30rem]"></div>
-      </div>
-
-      <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div class="rounded-2xl bg-white/[0.08] p-4">
-          <p class="text-lg font-extrabold text-white">{{ distance() }} km</p>
-          <p class="mt-1 text-xs font-semibold text-white/45">Distance</p>
-        </div>
-
-        <div class="rounded-2xl bg-white/[0.08] p-4">
-          <p class="text-lg font-extrabold text-white">{{ estimatedTime() }} min</p>
-          <p class="mt-1 text-xs font-semibold text-white/45">Time</p>
-        </div>
-
-        <div class="rounded-2xl bg-white/[0.08] p-4">
-          <p class="text-lg font-extrabold text-white">{{ transportType() }}</p>
-          <p class="mt-1 text-xs font-semibold text-white/45">Mode</p>
-        </div>
-
-        <div class="rounded-2xl bg-white/[0.08] p-4">
-          <p class="text-lg font-extrabold text-white">OpenStreetMap</p>
-          <p class="mt-1 text-xs font-semibold text-white/45">Tiles</p>
-        </div>
-      </div>
+      class="pointer-events-none absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-[#fffaf2]/84 px-3 py-2 shadow-[0_16px_40px_rgba(29,29,31,0.12)] backdrop-blur-xl"
+    >
+      <span class="h-1.5 w-1.5 rounded-full bg-[#4f7cff]"></span>
+      <span class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6b665f]">
+        Route map
+      </span>
     </div>
   </div>
 </section>
