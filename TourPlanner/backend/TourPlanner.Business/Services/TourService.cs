@@ -1,4 +1,5 @@
 using TourPlanner.Business.Interfaces;
+using TourPlanner.Data.Storage;
 using TourPlanner.Models;
 using TourPlanner.Models.Dtos;
 
@@ -6,17 +7,21 @@ namespace TourPlanner.Business.Services;
 
 public class TourService : ITourService
 {
-    private readonly List<Tour> tours = [];
-    private int nextId = 1;
+    private readonly InMemoryDataStore dataStore;
+
+    public TourService(InMemoryDataStore dataStore)
+    {
+        this.dataStore = dataStore;
+    }
 
     public Task<IEnumerable<TourResponseDto>> GetAllToursAsync()
     {
-        return Task.FromResult(tours.Select(MapToResponseDto));
+        return Task.FromResult(dataStore.Tours.Select(MapToResponseDto));
     }
 
     public Task<TourResponseDto?> GetTourByIdAsync(int id)
     {
-        Tour? tour = tours.FirstOrDefault(tour => tour.Id == id);
+        Tour? tour = dataStore.Tours.FirstOrDefault(tour => tour.Id == id);
         return Task.FromResult(tour is null ? null : MapToResponseDto(tour));
     }
 
@@ -26,7 +31,7 @@ public class TourService : ITourService
 
         Tour tour = new()
         {
-            Id = nextId++,
+            Id = GetNextTourId(),
             Name = dto.Name,
             Description = dto.Description,
             From = dto.From,
@@ -38,7 +43,7 @@ public class TourService : ITourService
             CreatedAt = DateTime.UtcNow
         };
 
-        tours.Add(tour);
+        dataStore.Tours.Add(tour);
 
         return Task.FromResult(MapToResponseDto(tour));
     }
@@ -47,7 +52,7 @@ public class TourService : ITourService
     {
         ValidateTour(dto.Name, dto.From, dto.To);
 
-        Tour? tour = tours.FirstOrDefault(tour => tour.Id == id);
+        Tour? tour = dataStore.Tours.FirstOrDefault(tour => tour.Id == id);
         if (tour is null)
         {
             return Task.FromResult<TourResponseDto?>(null);
@@ -64,14 +69,19 @@ public class TourService : ITourService
 
     public Task<bool> DeleteTourAsync(int id)
     {
-        Tour? tour = tours.FirstOrDefault(tour => tour.Id == id);
+        Tour? tour = dataStore.Tours.FirstOrDefault(tour => tour.Id == id);
         if (tour is null)
         {
             return Task.FromResult(false);
         }
 
-        tours.Remove(tour);
+        dataStore.Tours.Remove(tour);
         return Task.FromResult(true);
+    }
+
+    private int GetNextTourId()
+    {
+        return dataStore.Tours.Count == 0 ? 1 : dataStore.Tours.Max(tour => tour.Id) + 1;
     }
 
     private static void ValidateTour(string name, string from, string to)
@@ -89,6 +99,11 @@ public class TourService : ITourService
         if (string.IsNullOrWhiteSpace(to))
         {
             throw new ArgumentException("To must not be empty.");
+        }
+
+        if (string.Equals(from.Trim(), to.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException("From and To must not be identical.");
         }
     }
 
