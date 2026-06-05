@@ -1,119 +1,236 @@
-# Tour Planner
+# TourPlanner
 
-Tour Planner is a semester project for planning and managing tours. The current intermediate backend uses a simple ASP.NET Core Web API with layered projects and in-memory tour data.
+TourPlanner is a full-stack application for planning and managing personal tours.
 
-## Folder Structure
+The project contains:
 
-- `backend/` contains the ASP.NET Core Web API solution and projects.
-- `backend/TourPlanner.Api/` contains the API entry point and controllers.
-- `backend/TourPlanner.Business/` contains business interfaces and services.
-- `backend/TourPlanner.Data/` is reserved for data access code.
-- `backend/TourPlanner.Models/` contains shared model classes.
-- `backend/TourPlanner.Tests/` contains NUnit tests.
-- `frontend/tour-planner-ui/` contains the Angular application.
-- `docs/uml/` is reserved for UML diagrams.
-- `docs/wireframes/` is reserved for UI wireframes.
+- An ASP.NET Core backend with Entity Framework Core, PostgreSQL and JWT authentication
+- An Angular frontend with TypeScript, Tailwind CSS, Angular Router and Leaflet
+- A Docker Compose setup for the local PostgreSQL development database only
 
-## Start the Backend
+The backend and frontend still run locally during development. Only PostgreSQL runs in Docker, so PostgreSQL does not need to be installed on the developer machine.
+
+## Project Structure
+
+```text
+TourPlanner/
++-- backend/
+|   +-- TourPlanner.Api/
+|   +-- TourPlanner.Business/
+|   +-- TourPlanner.Data/
+|   +-- TourPlanner.Models/
+|   +-- TourPlanner.Tests/
+|   +-- TourPlanner.sln
++-- frontend/
+|   +-- tour-planner-ui/
++-- docs/
++-- docker-compose.yml
++-- README.md
+```
+
+## Technologies
+
+Backend:
+
+- ASP.NET Core
+- Entity Framework Core
+- PostgreSQL
+- JWT authentication
+- Layered architecture
+
+Frontend:
+
+- Angular
+- TypeScript
+- Tailwind CSS
+- Angular Signals
+- Angular Standalone Components
+- Angular Router
+- Leaflet
+
+Development database:
+
+- Docker Compose
+- PostgreSQL 17
+
+## Backend Architecture
+
+The backend is split into layered ASP.NET Core projects:
+
+- `TourPlanner.Api`: controllers, HTTP status codes, Swagger, JWT authentication and dependency injection
+- `TourPlanner.Business`: services, DTO mapping and business validation
+- `TourPlanner.Data`: Entity Framework Core context and repositories
+- `TourPlanner.Models`: entities, enums and DTOs
+- `TourPlanner.Tests`: test project placeholder
+
+Current data flow:
+
+```text
+API Layer -> Business Layer -> Repository Layer -> Entity Framework Core -> PostgreSQL
+```
+
+## Development PostgreSQL
+
+Start PostgreSQL from the repository root:
 
 ```powershell
-cd TourPlanner/backend
+docker compose up -d
+```
+
+Check database status:
+
+```powershell
+docker compose ps
+```
+
+The development connection string in `backend/TourPlanner.Api/appsettings.Development.json` is:
+
+```text
+Host=localhost;Port=5432;Database=tourplanner;Username=postgres;Password=postgres
+```
+
+These credentials are local development placeholders only. Production database credentials and JWT secrets must be stored in environment variables or secret storage.
+
+Apply Entity Framework Core migrations from the `backend` directory:
+
+```powershell
+cd backend
+dotnet ef database update --project TourPlanner.Data --startup-project TourPlanner.Api
+```
+
+Stop PostgreSQL while keeping stored data:
+
+```powershell
+docker compose down
+```
+
+Delete PostgreSQL including stored data:
+
+```powershell
+docker compose down -v
+```
+
+## Start Backend
+
+Open a terminal in the `backend` directory:
+
+```powershell
+cd backend
 dotnet run --project TourPlanner.Api
 ```
 
-The backend starts with the URLs printed by `dotnet run`. The current HTTP launch profile uses:
+Swagger is available in development at:
 
 ```text
-http://localhost:5161
+https://localhost:7115/swagger
+http://localhost:5161/swagger
 ```
 
-## Test the Health Endpoint
+The exact ports come from `backend/TourPlanner.Api/Properties/launchSettings.json`.
+
+## Start Frontend
+
+Open a terminal in the Angular project folder:
 
 ```powershell
-curl http://localhost:5161/api/health
+cd frontend/tour-planner-ui
 ```
 
-Expected response:
-
-```json
-{
-  "status": "ok",
-  "message": "TourPlanner API is running"
-}
-```
-
-## Test the Tour Endpoints Manually
-
-List all tours:
+Install dependencies:
 
 ```powershell
-curl http://localhost:5161/api/tours
-```
-
-Create a tour:
-
-```powershell
-curl -X POST http://localhost:5161/api/tours `
-  -H "Content-Type: application/json" `
-  -d "{\"name\":\"Morning Ride\",\"description\":\"Short city tour\",\"from\":\"Vienna\",\"to\":\"Klosterneuburg\",\"transportType\":\"Bike\"}"
-```
-
-Get one tour:
-
-```text
-GET http://localhost:5161/api/tours/1
-```
-
-Update a tour:
-
-```powershell
-curl -X PUT http://localhost:5161/api/tours/1 `
-  -H "Content-Type: application/json" `
-  -d "{\"name\":\"Updated Ride\",\"description\":\"Updated city tour\",\"from\":\"Vienna\",\"to\":\"Tulln\",\"transportType\":\"Bike\"}"
-```
-
-Delete a tour:
-
-```powershell
-curl -X DELETE http://localhost:5161/api/tours/1
-```
-
-Validation rules for creating and updating tours:
-
-- `name` must not be empty.
-- `from` must not be empty.
-- `to` must not be empty.
-
-## Start the Frontend
-
-```powershell
-cd TourPlanner/frontend/tour-planner-ui
 npm install
+```
+
+Start the Angular development server:
+
+```powershell
 npm start
 ```
 
-## Initial Setup
+Open the application in the browser:
 
-This setup contains:
+```text
+http://localhost:4200
+```
 
-- An ASP.NET Core Web API project.
-- Layered class library projects for business, data, and models.
-- An NUnit test project.
-- Basic domain entities and DTOs.
-- A simple API health controller.
-- Basic tour CRUD endpoints.
-- An in-memory tour service in the business layer.
-- An Angular project with routing and SCSS.
-- Documentation folders, README, and `.gitignore`.
+## Main Features
 
-## Current Backend Architecture
+- Register a user
+- Login and logout
+- Create tours
+- View all tours in a list
+- Search tours
+- Open tour details
+- Edit tours
+- Delete tours
+- Show an interactive Leaflet map on the tour detail page
+- Create tour logs
+- Edit tour logs
+- Delete tour logs
+- Input validation for forms
+- Responsive design for desktop and smaller screens
 
-- `TourPlanner.Api` contains controllers and HTTP endpoint configuration.
-- `TourPlanner.Business` contains service interfaces and business logic.
-- `TourPlanner.Models` contains domain entities, DTOs, and enums shared by the backend projects.
-- `TourPlanner.Data` is reserved for future database access.
-- `TourPlanner.Tests` is reserved for future automated tests.
+## Backend Endpoints
 
-The tour data is currently stored in an in-memory list inside `TourService`. Data is lost when the backend stops.
+- `GET /api/health`
+- `GET /api/tours`
+- `GET /api/tours/{id}`
+- `POST /api/tours`
+- `PUT /api/tours/{id}`
+- `DELETE /api/tours/{id}`
+- `GET /api/tours/{tourId}/logs`
+- `GET /api/tours/{tourId}/logs/{logId}`
+- `POST /api/tours/{tourId}/logs`
+- `PUT /api/tours/{tourId}/logs/{logId}`
+- `DELETE /api/tours/{tourId}/logs/{logId}`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
 
-No PostgreSQL, Entity Framework, authentication, OpenRouteService integration, TourLog endpoints, or unit tests have been added yet.
+## Frontend Routes
+
+| Route        | Description                             |
+| ------------ | --------------------------------------- |
+| `/login`     | Login page                              |
+| `/register`  | Register page                           |
+| `/tours`     | Tour overview page                      |
+| `/tours/:id` | Tour detail page with map and tour logs |
+
+## Authentication
+
+Users can register with a username, email and password. Passwords are hashed with `PasswordHasher<User>` before they are stored in PostgreSQL.
+
+Login verifies the stored password hash and returns an `AuthResponseDto` with a JWT token. Password hashes are never returned through API responses.
+
+`GET /api/auth/me` requires a valid Bearer token. Tour endpoints are intentionally not protected yet because tour ownership and user-specific filtering will be added later.
+
+## Manual Test Flow
+
+1. Start PostgreSQL with `docker compose up -d`.
+2. Apply migrations from `backend`.
+3. Start the backend.
+4. Start the frontend.
+5. Open `http://localhost:4200`.
+6. Register a user.
+7. Log in with the created user.
+8. Create a tour.
+9. Search for the tour.
+10. Open the tour details.
+11. Check the Leaflet map.
+12. Add, edit and delete a tour log.
+13. Edit and delete the tour.
+14. Restart the API and verify that database data still exists.
+
+## Database Access With DBeaver
+
+Use these connection settings:
+
+```text
+Database type: PostgreSQL
+Host: localhost
+Port: 5432
+Database: tourplanner
+Username: postgres
+Password: postgres
+```
