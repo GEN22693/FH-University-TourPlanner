@@ -1,12 +1,15 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TourPlanner.Api.Services;
 using TourPlanner.Business.Interfaces;
 using TourPlanner.Business.Services;
-using TourPlanner.Data.Storage;
+using TourPlanner.Data.Context;
+using TourPlanner.Data.Repositories;
+using TourPlanner.Data.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,11 +71,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddSingleton<InMemoryDataStore>();
-builder.Services.AddSingleton<ITourService, TourService>();
-builder.Services.AddSingleton<ITourLogService, TourLogService>();
-builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
-builder.Services.AddSingleton<IAuthService, AuthService>();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITourRepository, TourRepository>();
+builder.Services.AddScoped<ITourLogRepository, TourLogRepository>();
+
+builder.Services.AddScoped<ITourService, TourService>();
+builder.Services.AddScoped<ITourLogService, TourLogService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 

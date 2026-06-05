@@ -1,5 +1,5 @@
 using TourPlanner.Business.Interfaces;
-using TourPlanner.Data.Storage;
+using TourPlanner.Data.Repositories.Interfaces;
 using TourPlanner.Models;
 using TourPlanner.Models.Dtos;
 using TourPlanner.Models.Enums;
@@ -8,39 +8,42 @@ namespace TourPlanner.Business.Services;
 
 public class TourLogService : ITourLogService
 {
-    private readonly InMemoryDataStore dataStore;
+    private readonly ITourRepository tourRepository;
+    private readonly ITourLogRepository tourLogRepository;
 
-    public TourLogService(InMemoryDataStore dataStore)
+    public TourLogService(ITourRepository tourRepository, ITourLogRepository tourLogRepository)
     {
-        this.dataStore = dataStore;
+        this.tourRepository = tourRepository;
+        this.tourLogRepository = tourLogRepository;
     }
 
-    public Task<IEnumerable<TourLogResponseDto>> GetLogsByTourIdAsync(int tourId)
+    public async Task<IEnumerable<TourLogResponseDto>> GetLogsByTourIdAsync(int tourId)
     {
-        Tour? tour = FindTour(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");
         }
 
-        return Task.FromResult(tour.TourLogs.Select(MapToResponseDto));
+        IEnumerable<TourLog> logs = await tourLogRepository.GetByTourIdAsync(tourId);
+        return logs.Select(MapToResponseDto);
     }
 
-    public Task<TourLogResponseDto?> GetLogByIdAsync(int tourId, int logId)
+    public async Task<TourLogResponseDto?> GetLogByIdAsync(int tourId, int logId)
     {
-        Tour? tour = FindTour(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");
         }
 
-        TourLog? tourLog = tour.TourLogs.FirstOrDefault(log => log.Id == logId);
-        return Task.FromResult(tourLog is null ? null : MapToResponseDto(tourLog));
+        TourLog? tourLog = await tourLogRepository.GetByIdAsync(tourId, logId);
+        return tourLog is null ? null : MapToResponseDto(tourLog);
     }
 
-    public Task<TourLogResponseDto> CreateLogAsync(int tourId, CreateTourLogDto dto)
+    public async Task<TourLogResponseDto> CreateLogAsync(int tourId, CreateTourLogDto dto)
     {
-        Tour? tour = FindTour(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");
@@ -50,10 +53,8 @@ public class TourLogService : ITourLogService
 
         TourLog tourLog = new()
         {
-            Id = GetNextLogId(tour),
             TourId = tour.Id,
-            Tour = tour,
-            DateTime = dto.DateTime,
+            DateTime = ToUtc(dto.DateTime),
             Comment = dto.Comment,
             Difficulty = dto.Difficulty,
             TotalDistance = dto.TotalDistance,
@@ -61,14 +62,14 @@ public class TourLogService : ITourLogService
             Rating = dto.Rating
         };
 
-        tour.TourLogs.Add(tourLog);
+        TourLog createdLog = await tourLogRepository.CreateAsync(tourLog);
 
-        return Task.FromResult(MapToResponseDto(tourLog));
+        return MapToResponseDto(createdLog);
     }
 
-    public Task<TourLogResponseDto?> UpdateLogAsync(int tourId, int logId, UpdateTourLogDto dto)
+    public async Task<TourLogResponseDto?> UpdateLogAsync(int tourId, int logId, UpdateTourLogDto dto)
     {
-        Tour? tour = FindTour(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");
@@ -76,48 +77,32 @@ public class TourLogService : ITourLogService
 
         ValidateTourLog(dto.Difficulty, dto.TotalDistance, dto.TotalTime, dto.Rating);
 
-        TourLog? tourLog = tour.TourLogs.FirstOrDefault(log => log.Id == logId);
+        TourLog? tourLog = await tourLogRepository.GetByIdAsync(tourId, logId);
         if (tourLog is null)
         {
-            return Task.FromResult<TourLogResponseDto?>(null);
+            return null;
         }
 
-        tourLog.DateTime = dto.DateTime;
+        tourLog.DateTime = ToUtc(dto.DateTime);
         tourLog.Comment = dto.Comment;
         tourLog.Difficulty = dto.Difficulty;
         tourLog.TotalDistance = dto.TotalDistance;
         tourLog.TotalTime = dto.TotalTime;
         tourLog.Rating = dto.Rating;
 
-        return Task.FromResult<TourLogResponseDto?>(MapToResponseDto(tourLog));
+        TourLog? updatedLog = await tourLogRepository.UpdateAsync(tourLog);
+        return updatedLog is null ? null : MapToResponseDto(updatedLog);
     }
 
-    public Task<bool> DeleteLogAsync(int tourId, int logId)
+    public async Task<bool> DeleteLogAsync(int tourId, int logId)
     {
-        Tour? tour = FindTour(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");
         }
 
-        TourLog? tourLog = tour.TourLogs.FirstOrDefault(log => log.Id == logId);
-        if (tourLog is null)
-        {
-            return Task.FromResult(false);
-        }
-
-        tour.TourLogs.Remove(tourLog);
-        return Task.FromResult(true);
-    }
-
-    private Tour? FindTour(int tourId)
-    {
-        return dataStore.Tours.FirstOrDefault(tour => tour.Id == tourId);
-    }
-
-    private static int GetNextLogId(Tour tour)
-    {
-        return tour.TourLogs.Count == 0 ? 1 : tour.TourLogs.Max(log => log.Id) + 1;
+        return await tourLogRepository.DeleteAsync(tourId, logId);
     }
 
     private static void ValidateTourLog(Difficulty difficulty, double totalDistance, TimeSpan totalTime, int rating)
@@ -156,5 +141,12 @@ public class TourLogService : ITourLogService
             TotalTime = tourLog.TotalTime,
             Rating = tourLog.Rating
         };
+    }
+
+    private static DateTime ToUtc(DateTime dateTime)
+    {
+        return dateTime.Kind == DateTimeKind.Utc
+            ? dateTime
+            : DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
     }
 }

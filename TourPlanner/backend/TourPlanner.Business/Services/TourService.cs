@@ -1,5 +1,5 @@
 using TourPlanner.Business.Interfaces;
-using TourPlanner.Data.Storage;
+using TourPlanner.Data.Repositories.Interfaces;
 using TourPlanner.Models;
 using TourPlanner.Models.Dtos;
 
@@ -7,31 +7,33 @@ namespace TourPlanner.Business.Services;
 
 public class TourService : ITourService
 {
-    private readonly InMemoryDataStore dataStore;
+    private const int TemporarySystemUserId = 1;
+    private readonly ITourRepository tourRepository;
 
-    public TourService(InMemoryDataStore dataStore)
+    public TourService(ITourRepository tourRepository)
     {
-        this.dataStore = dataStore;
+        this.tourRepository = tourRepository;
     }
 
-    public Task<IEnumerable<TourResponseDto>> GetAllToursAsync()
+    public async Task<IEnumerable<TourResponseDto>> GetAllToursAsync()
     {
-        return Task.FromResult(dataStore.Tours.Select(MapToResponseDto));
+        IEnumerable<Tour> tours = await tourRepository.GetAllAsync();
+        return tours.Select(MapToResponseDto);
     }
 
-    public Task<TourResponseDto?> GetTourByIdAsync(int id)
+    public async Task<TourResponseDto?> GetTourByIdAsync(int id)
     {
-        Tour? tour = dataStore.Tours.FirstOrDefault(tour => tour.Id == id);
-        return Task.FromResult(tour is null ? null : MapToResponseDto(tour));
+        Tour? tour = await tourRepository.GetByIdAsync(id);
+        return tour is null ? null : MapToResponseDto(tour);
     }
 
-    public Task<TourResponseDto> CreateTourAsync(CreateTourDto dto)
+    public async Task<TourResponseDto> CreateTourAsync(CreateTourDto dto)
     {
         ValidateTour(dto.Name, dto.From, dto.To);
 
         Tour tour = new()
         {
-            Id = GetNextTourId(),
+            UserId = TemporarySystemUserId,
             Name = dto.Name,
             Description = dto.Description,
             From = dto.From,
@@ -43,19 +45,19 @@ public class TourService : ITourService
             CreatedAt = DateTime.UtcNow
         };
 
-        dataStore.Tours.Add(tour);
+        Tour createdTour = await tourRepository.CreateAsync(tour);
 
-        return Task.FromResult(MapToResponseDto(tour));
+        return MapToResponseDto(createdTour);
     }
 
-    public Task<TourResponseDto?> UpdateTourAsync(int id, UpdateTourDto dto)
+    public async Task<TourResponseDto?> UpdateTourAsync(int id, UpdateTourDto dto)
     {
         ValidateTour(dto.Name, dto.From, dto.To);
 
-        Tour? tour = dataStore.Tours.FirstOrDefault(tour => tour.Id == id);
+        Tour? tour = await tourRepository.GetByIdAsync(id);
         if (tour is null)
         {
-            return Task.FromResult<TourResponseDto?>(null);
+            return null;
         }
 
         tour.Name = dto.Name;
@@ -64,24 +66,13 @@ public class TourService : ITourService
         tour.To = dto.To;
         tour.TransportType = dto.TransportType;
 
-        return Task.FromResult<TourResponseDto?>(MapToResponseDto(tour));
+        Tour? updatedTour = await tourRepository.UpdateAsync(tour);
+        return updatedTour is null ? null : MapToResponseDto(updatedTour);
     }
 
     public Task<bool> DeleteTourAsync(int id)
     {
-        Tour? tour = dataStore.Tours.FirstOrDefault(tour => tour.Id == id);
-        if (tour is null)
-        {
-            return Task.FromResult(false);
-        }
-
-        dataStore.Tours.Remove(tour);
-        return Task.FromResult(true);
-    }
-
-    private int GetNextTourId()
-    {
-        return dataStore.Tours.Count == 0 ? 1 : dataStore.Tours.Max(tour => tour.Id) + 1;
+        return tourRepository.DeleteAsync(id);
     }
 
     private static void ValidateTour(string name, string from, string to)
