@@ -203,7 +203,23 @@ Users can register with a username, email and password. Passwords are hashed wit
 
 Login verifies the stored password hash and returns an `AuthResponseDto` with a JWT token. Password hashes are never returned through API responses.
 
-`GET /api/auth/me` requires a valid Bearer token. Tour endpoints are intentionally not protected yet because tour ownership and user-specific filtering will be added later.
+`GET /api/auth/me` requires a valid Bearer token. Tour and tour log endpoints also require a valid Bearer token, and tours are scoped to the authenticated user: a user only sees, edits and deletes their own tours.
+
+## OpenRouteService Setup
+
+Creating or updating a tour calculates the real distance, estimated travel time and route information between `From` and `To` using the [OpenRouteService](https://openrouteservice.org/) API.
+
+1. Create a free account at <https://openrouteservice.org/dev/#/signup>.
+2. Request a token in the dashboard (free tier: 2,000 requests/day).
+3. Store the key locally with .NET user-secrets so it never ends up in the repository:
+
+```powershell
+cd backend/TourPlanner.Api
+dotnet user-secrets init
+dotnet user-secrets set "OpenRouteService:ApiKey" "<your-api-key>"
+```
+
+`appsettings.json` only contains an empty placeholder for `OpenRouteService:ApiKey`. Without a configured key, creating or updating a tour fails with a clear error message instead of a silent crash.
 
 ## Manual Test Flow
 

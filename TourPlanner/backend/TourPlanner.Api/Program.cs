@@ -84,6 +84,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.Configure<OpenRouteServiceSettings>(
+    builder.Configuration.GetSection(OpenRouteServiceSettings.SectionName));
+builder.Services.AddHttpClient<IRouteService, OpenRouteServiceClient>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITourRepository, TourRepository>();
 builder.Services.AddScoped<ITourLogRepository, TourLogRepository>();

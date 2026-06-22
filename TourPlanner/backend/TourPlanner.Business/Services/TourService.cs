@@ -8,10 +8,12 @@ namespace TourPlanner.Business.Services;
 public class TourService : ITourService
 {
     private readonly ITourRepository tourRepository;
+    private readonly IRouteService routeService;
 
-    public TourService(ITourRepository tourRepository)
+    public TourService(ITourRepository tourRepository, IRouteService routeService)
     {
         this.tourRepository = tourRepository;
+        this.routeService = routeService;
     }
 
     public async Task<IEnumerable<TourResponseDto>> GetAllToursAsync(int userId)
@@ -30,6 +32,8 @@ public class TourService : ITourService
     {
         ValidateTour(dto.Name, dto.From, dto.To);
 
+        RouteResult route = await routeService.GetRouteAsync(dto.From, dto.To, dto.TransportType);
+
         Tour tour = new()
         {
             UserId = userId,
@@ -38,9 +42,9 @@ public class TourService : ITourService
             From = dto.From,
             To = dto.To,
             TransportType = dto.TransportType,
-            Distance = 0,
-            EstimatedTime = TimeSpan.Zero,
-            RouteInformation = string.Empty,
+            Distance = route.DistanceMeters,
+            EstimatedTime = route.Duration,
+            RouteInformation = route.RouteInformation,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -59,11 +63,16 @@ public class TourService : ITourService
             return null;
         }
 
+        RouteResult route = await routeService.GetRouteAsync(dto.From, dto.To, dto.TransportType);
+
         tour.Name = dto.Name;
         tour.Description = dto.Description;
         tour.From = dto.From;
         tour.To = dto.To;
         tour.TransportType = dto.TransportType;
+        tour.Distance = route.DistanceMeters;
+        tour.EstimatedTime = route.Duration;
+        tour.RouteInformation = route.RouteInformation;
 
         Tour? updatedTour = await tourRepository.UpdateAsync(tour, userId);
         return updatedTour is null ? null : MapToResponseDto(updatedTour);

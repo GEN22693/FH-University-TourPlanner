@@ -52,6 +52,10 @@ public class TourController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+        catch (InvalidOperationException ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id:int}")]
@@ -70,6 +74,10 @@ public class TourController : ControllerBase
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
         }
     }
 
