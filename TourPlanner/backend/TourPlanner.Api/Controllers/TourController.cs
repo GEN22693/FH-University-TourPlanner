@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TourPlanner.Business.Interfaces;
 using TourPlanner.Models.Dtos;
@@ -6,6 +8,7 @@ namespace TourPlanner.Api.Controllers;
 
 [ApiController]
 [Route("api/tours")]
+[Authorize]
 public class TourController : ControllerBase
 {
     private readonly ITourService tourService;
@@ -15,17 +18,20 @@ public class TourController : ControllerBase
         this.tourService = tourService;
     }
 
+    private int GetUserId() =>
+        int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TourResponseDto>>> GetAllTours()
     {
-        IEnumerable<TourResponseDto> tours = await tourService.GetAllToursAsync();
+        IEnumerable<TourResponseDto> tours = await tourService.GetAllToursAsync(GetUserId());
         return Ok(tours);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TourResponseDto>> GetTourById(int id)
     {
-        TourResponseDto? tour = await tourService.GetTourByIdAsync(id);
+        TourResponseDto? tour = await tourService.GetTourByIdAsync(id, GetUserId());
         if (tour is null)
         {
             return NotFound();
@@ -39,7 +45,7 @@ public class TourController : ControllerBase
     {
         try
         {
-            TourResponseDto createdTour = await tourService.CreateTourAsync(dto);
+            TourResponseDto createdTour = await tourService.CreateTourAsync(dto, GetUserId());
             return CreatedAtAction(nameof(GetTourById), new { id = createdTour.Id }, createdTour);
         }
         catch (ArgumentException ex)
@@ -53,7 +59,7 @@ public class TourController : ControllerBase
     {
         try
         {
-            TourResponseDto? updatedTour = await tourService.UpdateTourAsync(id, dto);
+            TourResponseDto? updatedTour = await tourService.UpdateTourAsync(id, dto, GetUserId());
             if (updatedTour is null)
             {
                 return NotFound();
@@ -70,7 +76,7 @@ public class TourController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteTour(int id)
     {
-        bool wasDeleted = await tourService.DeleteTourAsync(id);
+        bool wasDeleted = await tourService.DeleteTourAsync(id, GetUserId());
         if (!wasDeleted)
         {
             return NotFound();

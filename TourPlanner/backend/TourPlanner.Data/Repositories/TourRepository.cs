@@ -14,20 +14,22 @@ public class TourRepository : ITourRepository
         this.dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<Tour>> GetAllAsync()
+    public async Task<IEnumerable<Tour>> GetAllAsync(int userId)
     {
         return await dbContext.Tours
             .AsNoTracking()
+            .Where(tour => tour.UserId == userId)
             .Include(tour => tour.TourLogs)
             .ToListAsync();
     }
 
-    public Task<Tour?> GetByIdAsync(int id)
+    public Task<Tour?> GetByIdAsync(int id, int userId)
     {
         return dbContext.Tours
             .AsNoTracking()
+            .Where(tour => tour.Id == id && tour.UserId == userId)
             .Include(tour => tour.TourLogs)
-            .FirstOrDefaultAsync(tour => tour.Id == id);
+            .FirstOrDefaultAsync();
     }
 
     public async Task<Tour> CreateAsync(Tour tour)
@@ -38,9 +40,9 @@ public class TourRepository : ITourRepository
         return tour;
     }
 
-    public async Task<Tour?> UpdateAsync(Tour tour)
+    public async Task<Tour?> UpdateAsync(Tour tour, int userId)
     {
-        Tour? existingTour = await dbContext.Tours.FirstOrDefaultAsync(existingTour => existingTour.Id == tour.Id);
+        Tour? existingTour = await dbContext.Tours.FirstOrDefaultAsync(t => t.Id == tour.Id && t.UserId == userId);
         if (existingTour is null)
         {
             return null;
@@ -60,9 +62,9 @@ public class TourRepository : ITourRepository
         return existingTour;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id, int userId)
     {
-        Tour? tour = await dbContext.Tours.FirstOrDefaultAsync(tour => tour.Id == id);
+        Tour? tour = await dbContext.Tours.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         if (tour is null)
         {
             return false;

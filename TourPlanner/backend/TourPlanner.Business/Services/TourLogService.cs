@@ -17,9 +17,9 @@ public class TourLogService : ITourLogService
         this.tourLogRepository = tourLogRepository;
     }
 
-    public async Task<IEnumerable<TourLogResponseDto>> GetLogsByTourIdAsync(int tourId)
+    public async Task<IEnumerable<TourLogResponseDto>> GetLogsByTourIdAsync(int tourId, int userId)
     {
-        Tour? tour = await tourRepository.GetByIdAsync(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId, userId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");
@@ -29,9 +29,9 @@ public class TourLogService : ITourLogService
         return logs.Select(MapToResponseDto);
     }
 
-    public async Task<TourLogResponseDto?> GetLogByIdAsync(int tourId, int logId)
+    public async Task<TourLogResponseDto?> GetLogByIdAsync(int tourId, int logId, int userId)
     {
-        Tour? tour = await tourRepository.GetByIdAsync(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId, userId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");
@@ -41,9 +41,9 @@ public class TourLogService : ITourLogService
         return tourLog is null ? null : MapToResponseDto(tourLog);
     }
 
-    public async Task<TourLogResponseDto> CreateLogAsync(int tourId, CreateTourLogDto dto)
+    public async Task<TourLogResponseDto> CreateLogAsync(int tourId, CreateTourLogDto dto, int userId)
     {
-        Tour? tour = await tourRepository.GetByIdAsync(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId, userId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");
@@ -67,9 +67,9 @@ public class TourLogService : ITourLogService
         return MapToResponseDto(createdLog);
     }
 
-    public async Task<TourLogResponseDto?> UpdateLogAsync(int tourId, int logId, UpdateTourLogDto dto)
+    public async Task<TourLogResponseDto?> UpdateLogAsync(int tourId, int logId, UpdateTourLogDto dto, int userId)
     {
-        Tour? tour = await tourRepository.GetByIdAsync(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId, userId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");
@@ -94,9 +94,9 @@ public class TourLogService : ITourLogService
         return updatedLog is null ? null : MapToResponseDto(updatedLog);
     }
 
-    public async Task<bool> DeleteLogAsync(int tourId, int logId)
+    public async Task<bool> DeleteLogAsync(int tourId, int logId, int userId)
     {
-        Tour? tour = await tourRepository.GetByIdAsync(tourId);
+        Tour? tour = await tourRepository.GetByIdAsync(tourId, userId);
         if (tour is null)
         {
             throw new ArgumentException("Tour does not exist.");

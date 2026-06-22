@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TourPlanner.Business.Interfaces;
 using TourPlanner.Models.Dtos;
@@ -6,6 +8,7 @@ namespace TourPlanner.Api.Controllers;
 
 [ApiController]
 [Route("api/tours/{tourId:int}/logs")]
+[Authorize]
 public class TourLogController : ControllerBase
 {
     private readonly ITourLogService tourLogService;
@@ -15,12 +18,15 @@ public class TourLogController : ControllerBase
         this.tourLogService = tourLogService;
     }
 
+    private int GetUserId() =>
+        int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TourLogResponseDto>>> GetLogsByTourId(int tourId)
     {
         try
         {
-            IEnumerable<TourLogResponseDto> logs = await tourLogService.GetLogsByTourIdAsync(tourId);
+            IEnumerable<TourLogResponseDto> logs = await tourLogService.GetLogsByTourIdAsync(tourId, GetUserId());
             return Ok(logs);
         }
         catch (ArgumentException)
@@ -34,7 +40,7 @@ public class TourLogController : ControllerBase
     {
         try
         {
-            TourLogResponseDto? log = await tourLogService.GetLogByIdAsync(tourId, logId);
+            TourLogResponseDto? log = await tourLogService.GetLogByIdAsync(tourId, logId, GetUserId());
             if (log is null)
             {
                 return NotFound();
@@ -53,7 +59,7 @@ public class TourLogController : ControllerBase
     {
         try
         {
-            TourLogResponseDto createdLog = await tourLogService.CreateLogAsync(tourId, dto);
+            TourLogResponseDto createdLog = await tourLogService.CreateLogAsync(tourId, dto, GetUserId());
             return CreatedAtAction(nameof(GetLogById), new { tourId, logId = createdLog.Id }, createdLog);
         }
         catch (ArgumentException ex) when (ex.Message == "Tour does not exist.")
@@ -71,7 +77,7 @@ public class TourLogController : ControllerBase
     {
         try
         {
-            TourLogResponseDto? updatedLog = await tourLogService.UpdateLogAsync(tourId, logId, dto);
+            TourLogResponseDto? updatedLog = await tourLogService.UpdateLogAsync(tourId, logId, dto, GetUserId());
             if (updatedLog is null)
             {
                 return NotFound();
@@ -94,7 +100,7 @@ public class TourLogController : ControllerBase
     {
         try
         {
-            bool wasDeleted = await tourLogService.DeleteLogAsync(tourId, logId);
+            bool wasDeleted = await tourLogService.DeleteLogAsync(tourId, logId, GetUserId());
             if (!wasDeleted)
             {
                 return NotFound();
