@@ -1,0 +1,629 @@
+{
+  "info": {
+    "name": "TourPlanner API",
+    "description": "Collection for testing the TourPlanner backend. Run requests top to bottom inside a folder; auth tokens and IDs are stored automatically in collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5161" },
+    { "key": "token", "value": "" },
+    { "key": "tokenB", "value": "" },
+    { "key": "tourId", "value": "" },
+    { "key": "logId", "value": "" },
+    { "key": "runId", "value": "" }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "if (!pm.collectionVariables.get('runId')) {",
+          "  pm.collectionVariables.set('runId', Date.now());",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /api/health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /api/auth/register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('token', body.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"postmanuser\",\n  \"email\": \"postmanuser+{{runId}}@example.com\",\n  \"password\": \"Test12345!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /api/auth/login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('token', body.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"postmanuser+{{runId}}@example.com\",\n  \"password\": \"Test12345!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /api/auth/login (wrong password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"postmanuser+{{runId}}@example.com\",\n  \"password\": \"WrongPassword!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /api/auth/me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
+          "name": "GET /api/auth/me (no token, expect 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tours",
+      "item": [
+        {
+          "name": "POST /api/tours (create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('tourId', body.id);",
+                  "pm.test('distance was calculated by OpenRouteService', () => pm.expect(body.distance).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Vienna to Graz\",\n  \"description\": \"Sample tour\",\n  \"from\": \"Vienna, Austria\",\n  \"to\": \"Graz, Austria\",\n  \"transportType\": \"Vacation\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /api/tours (invalid, same from/to, expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Invalid Tour\",\n  \"description\": \"\",\n  \"from\": \"Vienna\",\n  \"to\": \"Vienna\",\n  \"transportType\": \"Bike\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /api/tours (no auth, expect 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tours",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"No Auth Tour\",\n  \"description\": \"\",\n  \"from\": \"Vienna\",\n  \"to\": \"Graz\",\n  \"transportType\": \"Bike\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /api/tours (list own tours)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('response is an array', () => Array.isArray(pm.response.json()));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours"
+          }
+        },
+        {
+          "name": "GET /api/tours/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}"
+          }
+        },
+        {
+          "name": "GET /api/tours/{id} (nonexistent, expect 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/999999"
+          }
+        },
+        {
+          "name": "PUT /api/tours/{id} (update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Vienna to Graz (updated)\",\n  \"description\": \"Updated description\",\n  \"from\": \"Vienna, Austria\",\n  \"to\": \"Salzburg, Austria\",\n  \"transportType\": \"Hike\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/tours/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tour Logs",
+      "item": [
+        {
+          "name": "Setup: create tour for logs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('tourId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tour for logs\",\n  \"description\": \"used to test tour logs\",\n  \"from\": \"Vienna, Austria\",\n  \"to\": \"Linz, Austria\",\n  \"transportType\": \"Bike\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /api/tours/{tourId}/logs (create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('logId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}/logs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateTime\": \"2026-06-01T10:00:00Z\",\n  \"comment\": \"Great tour\",\n  \"difficulty\": \"Medium\",\n  \"totalDistance\": 20.5,\n  \"totalTime\": \"03:00:00\",\n  \"rating\": 4\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /api/tours/{tourId}/logs (invalid rating, expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}/logs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateTime\": \"2026-06-01T10:00:00Z\",\n  \"comment\": \"Invalid rating\",\n  \"difficulty\": \"Medium\",\n  \"totalDistance\": 20.5,\n  \"totalTime\": \"03:00:00\",\n  \"rating\": 9\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /api/tours/{tourId}/logs (nonexistent tour, expect 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/999999/logs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateTime\": \"2026-06-01T10:00:00Z\",\n  \"comment\": \"orphan log\",\n  \"difficulty\": \"Medium\",\n  \"totalDistance\": 20.5,\n  \"totalTime\": \"03:00:00\",\n  \"rating\": 4\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /api/tours/{tourId}/logs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}/logs"
+          }
+        },
+        {
+          "name": "GET /api/tours/{tourId}/logs/{logId}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}/logs/{{logId}}"
+          }
+        },
+        {
+          "name": "PUT /api/tours/{tourId}/logs/{logId} (update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}/logs/{{logId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateTime\": \"2026-06-02T10:00:00Z\",\n  \"comment\": \"Updated comment\",\n  \"difficulty\": \"Hard\",\n  \"totalDistance\": 25,\n  \"totalTime\": \"04:00:00\",\n  \"rating\": 5\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/tours/{tourId}/logs/{logId}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}/logs/{{logId}}"
+          }
+        },
+        {
+          "name": "Cleanup: delete tour used for logs",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Isolation",
+      "item": [
+        {
+          "name": "User A: create private tour",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('tourId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Private Tour\",\n  \"description\": \"belongs to user A\",\n  \"from\": \"Vienna, Austria\",\n  \"to\": \"Linz, Austria\",\n  \"transportType\": \"Bike\"\n}"
+            }
+          }
+        },
+        {
+          "name": "User B: register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"postmanuserb\",\n  \"email\": \"postmanuserb+{{runId}}@example.com\",\n  \"password\": \"Test12345!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "User B: login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('tokenB', body.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"postmanuserb+{{runId}}@example.com\",\n  \"password\": \"Test12345!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "User B: GET user A's tour (expect 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenB}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}"
+          }
+        },
+        {
+          "name": "User B: GET /api/tours (expect empty list)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('list is empty', () => pm.expect(pm.response.json().length).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenB}}" }],
+            "url": "{{baseUrl}}/api/tours"
+          }
+        },
+        {
+          "name": "User B: DELETE user A's tour (expect 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenB}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}"
+          }
+        },
+        {
+          "name": "Cleanup: User A deletes private tour",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tours/{{tourId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

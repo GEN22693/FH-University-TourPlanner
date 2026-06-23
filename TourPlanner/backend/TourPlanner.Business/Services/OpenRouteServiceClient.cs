@@ -56,11 +56,16 @@ public class OpenRouteServiceClient : IRouteService
             throw new ArgumentException($"No route could be found between '{from}' and '{to}'.");
         }
 
+        TimeSpan duration = TimeSpan.FromSeconds(summary.Duration);
+        string durationText = duration.Days > 0
+            ? $"{duration.Days}d {duration:hh\\:mm\\:ss}"
+            : duration.ToString(@"hh\:mm\:ss");
+
         return new RouteResult
         {
             DistanceMeters = summary.Distance,
-            Duration = TimeSpan.FromSeconds(summary.Duration),
-            RouteInformation = $"Distance: {summary.Distance / 1000:F2} km, Duration: {TimeSpan.FromSeconds(summary.Duration):hh\\:mm\\:ss}"
+            Duration = duration,
+            RouteInformation = $"Distance: {summary.Distance / 1000:F2} km, Duration: {durationText}"
         };
     }
 
