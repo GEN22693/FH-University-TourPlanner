@@ -128,6 +128,13 @@ http://localhost:5161/swagger
 
 The exact ports come from `backend/TourPlanner.Api/Properties/launchSettings.json`.
 
+## Run Backend Tests
+
+```powershell
+cd backend
+dotnet test
+```
+
 ## Start Frontend
 
 Open a terminal in the Angular project folder:
