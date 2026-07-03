@@ -1,71 +1,78 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { AppUser, LoginData, RegisterData } from '../../models/auth.model';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
+
+import { API_BASE_URL } from '../api/api.config';
+import { AppUser, AuthMeResponse, AuthResponse, LoginData, RegisterData } from '../../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly usersKey = 'tourplanner_users';
+  private readonly http = inject(HttpClient);
+
+  private readonly tokenKey = 'tourplanner_auth_token';
   private readonly currentUserKey = 'tourplanner_current_user';
 
   private readonly currentUserSignal = signal<AppUser | null>(this.loadCurrentUser());
+  private readonly tokenSignal = signal<string | null>(this.loadToken());
 
   readonly currentUser = this.currentUserSignal.asReadonly();
-  readonly isLoggedIn = computed(() => this.currentUserSignal() !== null);
+  readonly token = this.tokenSignal.asReadonly();
 
-  register(data: RegisterData): string | null {
-    const users = this.loadUsers();
+  readonly isLoggedIn = computed(() => {
+    return this.currentUserSignal() !== null && this.tokenSignal() !== null;
+  });
 
-    const emailExists = users.some((user) => user.email.toLowerCase() === data.email.toLowerCase());
-
-    if (emailExists) {
-      return 'This email is already registered.';
-    }
-
-    const newUser: AppUser = {
-      id: crypto.randomUUID(),
-      username: data.username,
-      email: data.email,
-      password: data.password,
-    };
-
-    users.push(newUser);
-    localStorage.setItem(this.usersKey, JSON.stringify(users));
-
-    return null;
+  register(data: RegisterData): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${API_BASE_URL}/auth/register`, data);
   }
 
-  login(data: LoginData): string | null {
-    const users = this.loadUsers();
-
-    const foundUser = users.find(
-      (user) =>
-        user.email.toLowerCase() === data.email.toLowerCase() && user.password === data.password,
+  login(data: LoginData): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${API_BASE_URL}/auth/login`, data).pipe(
+      tap((response) => this.saveAuth(response)),
     );
+  }
 
-    if (!foundUser) {
-      return 'Email or password is wrong.';
-    }
+  loadMe(): Observable<AuthMeResponse> {
+    return this.http.get<AuthMeResponse>(`${API_BASE_URL}/auth/me`).pipe(
+      tap((response) => {
+        const user: AppUser = {
+          id: response.userId,
+          username: response.username,
+          email: response.email,
+        };
 
-    localStorage.setItem(this.currentUserKey, JSON.stringify(foundUser));
-    this.currentUserSignal.set(foundUser);
-
-    return null;
+        this.currentUserSignal.set(user);
+        localStorage.setItem(this.currentUserKey, JSON.stringify(user));
+      }),
+    );
   }
 
   logout(): void {
+    localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.currentUserKey);
+
+    this.tokenSignal.set(null);
     this.currentUserSignal.set(null);
   }
 
-  private loadUsers(): AppUser[] {
-    const rawUsers = localStorage.getItem(this.usersKey);
+  private saveAuth(response: AuthResponse): void {
+    const user: AppUser = {
+      id: response.userId,
+      username: response.username,
+      email: response.email,
+    };
 
-    if (!rawUsers) {
-      return [];
-    }
+    localStorage.setItem(this.tokenKey, response.token);
+    localStorage.setItem(this.currentUserKey, JSON.stringify(user));
 
-    return JSON.parse(rawUsers) as AppUser[];
+    this.tokenSignal.set(response.token);
+    this.currentUserSignal.set(user);
+  }
+
+  private loadToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
   }
 
   private loadCurrentUser(): AppUser | null {
@@ -75,6 +82,11 @@ export class AuthService {
       return null;
     }
 
-    return JSON.parse(rawUser) as AppUser;
+    try {
+      return JSON.parse(rawUser) as AppUser;
+    } catch {
+      localStorage.removeItem(this.currentUserKey);
+      return null;
+    }
   }
 }

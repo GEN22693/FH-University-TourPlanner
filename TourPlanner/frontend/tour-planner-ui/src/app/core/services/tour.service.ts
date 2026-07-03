@@ -15,7 +15,7 @@ export class TourService {
   readonly tours = this.toursSignal.asReadonly();
   readonly tourLogs = this.tourLogsSignal.asReadonly();
 
-  getToursByUser(userId: string): Tour[] {
+  getToursByUser(userId: number): Tour[] {
     return this.toursSignal().filter((tour) => tour.userId === userId);
   }
 

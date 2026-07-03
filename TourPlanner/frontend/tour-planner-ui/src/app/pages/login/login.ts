@@ -1,6 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { LoginData } from '../../models/auth.model';
@@ -13,10 +15,12 @@ import { LoginData } from '../../models/auth.model';
 export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly email = signal('');
   readonly password = signal('');
   readonly errorMessage = signal('');
+  readonly isSubmitting = signal(false);
 
   signIn(): void {
     this.errorMessage.set('');
@@ -31,13 +35,31 @@ export class Login {
       return;
     }
 
-    const error = this.authService.login(loginData);
+    this.isSubmitting.set(true);
 
-    if (error) {
-      this.errorMessage.set(error);
-      return;
+    this.authService
+      .login(loginData)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: () => {
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/tours';
+          this.router.navigateByUrl(returnUrl);
+        },
+        error: (error: unknown) => {
+          this.errorMessage.set(this.getErrorMessage(error, 'Email or password is wrong.'));
+        },
+      });
+  }
+
+  private getErrorMessage(error: unknown, fallbackMessage: string): string {
+    if (error instanceof HttpErrorResponse) {
+      const backendMessage = error.error?.message;
+
+      if (typeof backendMessage === 'string' && backendMessage.trim()) {
+        return backendMessage;
+      }
     }
 
-    this.router.navigate(['/tours']);
+    return fallbackMessage;
   }
 }

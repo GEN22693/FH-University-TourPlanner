@@ -1,7 +1,7 @@
 export interface TourLog {
   id: string;
   tourId: string;
-  userId: string;
+  userId: number;
   date: string;
   comment: string;
   difficulty: number;

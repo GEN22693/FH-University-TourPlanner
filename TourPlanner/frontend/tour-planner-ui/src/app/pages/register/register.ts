@@ -1,6 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { RegisterData } from '../../models/auth.model';
@@ -18,6 +20,7 @@ export class Register {
   readonly email = signal('');
   readonly password = signal('');
   readonly errorMessage = signal('');
+  readonly isSubmitting = signal(false);
 
   createAccount(): void {
     this.errorMessage.set('');
@@ -38,13 +41,30 @@ export class Register {
       return;
     }
 
-    const error = this.authService.register(registerData);
+    this.isSubmitting.set(true);
 
-    if (error) {
-      this.errorMessage.set(error);
-      return;
+    this.authService
+      .register(registerData)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: (error: unknown) => {
+          this.errorMessage.set(this.getErrorMessage(error, 'Registration failed.'));
+        },
+      });
+  }
+
+  private getErrorMessage(error: unknown, fallbackMessage: string): string {
+    if (error instanceof HttpErrorResponse) {
+      const backendMessage = error.error?.message;
+
+      if (typeof backendMessage === 'string' && backendMessage.trim()) {
+        return backendMessage;
+      }
     }
 
-    this.router.navigate(['/login']);
+    return fallbackMessage;
   }
 }
