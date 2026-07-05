@@ -77,9 +77,7 @@ export class MapFacadeService {
         this.drawRoutePoints(externalRoute, options.from, options.to);
         return;
       }
-    } catch {
-      // If external route loading fails, the map still shows a simple fallback line.
-    }
+    } catch {}
 
     const fallbackStart = this.getFallbackCoordinate(options.from);
     const fallbackEnd = this.getFallbackCoordinate(options.to);
