@@ -1,11 +1,30 @@
+export type Difficulty = 'Easy' | 'Medium' | 'Hard';
+
 export interface TourLog {
-  id: string;
-  tourId: string;
-  userId: number;
-  date: string;
+  id: number;
+  tourId: number;
+  dateTime: string;
   comment: string;
-  difficulty: number;
+  difficulty: Difficulty;
   totalDistance: number;
-  totalTime: number;
+  totalTime: string;
+  rating: number;
+}
+
+export interface CreateTourLogData {
+  dateTime: string;
+  comment: string;
+  difficulty: Difficulty;
+  totalDistance: number;
+  totalTime: string;
+  rating: number;
+}
+
+export interface UpdateTourLogData {
+  dateTime: string;
+  comment: string;
+  difficulty: Difficulty;
+  totalDistance: number;
+  totalTime: string;
   rating: number;
 }

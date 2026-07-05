@@ -84,7 +84,7 @@ public class AppDbContext : DbContext
                 .HasMaxLength(300);
 
             entity.Property(tour => tour.RouteInformation)
-                .HasMaxLength(4000);
+                .HasColumnType("text");
 
             entity.Property(tour => tour.CreatedAt)
                 .IsRequired();

@@ -1,226 +1,198 @@
-<section class="relative min-h-dvh overflow-hidden bg-[#ebe6dc] text-[#1d1d1f]">
-  <div class="pointer-events-none absolute inset-0">
-    <div
-      class="absolute left-[42%] top-[-24rem] h-[48rem] w-[48rem] -translate-x-1/2 rounded-full bg-white/88 blur-3xl"
-    ></div>
-
-    <div
-      class="absolute right-[-14rem] top-[7%] h-[40rem] w-[40rem] rounded-full bg-[#dce8f7]/68 blur-3xl"
-    ></div>
-
-    <div
-      class="absolute bottom-[-20rem] left-[-14rem] h-[44rem] w-[44rem] rounded-full bg-[#dccab1]/80 blur-3xl"
-    ></div>
-
-    <div
-      class="absolute left-[52%] top-[58%] h-[30rem] w-[30rem] rounded-full bg-[#d7a86e]/14 blur-3xl"
-    ></div>
+<section class="app-shell">
+  <div class="aurora" aria-hidden="true">
+    <div class="aurora__glow aurora__glow--one"></div>
+    <div class="aurora__glow aurora__glow--two"></div>
+    <div class="aurora__glow aurora__glow--three"></div>
   </div>
-
-  <div
-    class="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.48),rgba(255,255,255,0.08)_48%,rgba(255,255,255,0.34))]"
-  ></div>
 
   <app-navbar />
 
-  <main class="relative mx-auto max-w-6xl px-5 pb-32 pt-8 sm:px-8 md:pl-40 md:pr-10 md:pt-10">
-    @if (tour(); as selectedTour) {
-      <section class="mb-8 flex items-center justify-between gap-4">
-        <a
-          routerLink="/tours"
-          class="inline-flex h-12 items-center rounded-2xl border border-black/[0.07] bg-[#f8f4ec]/76 px-4 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6b665f] shadow-[0_14px_38px_rgba(29,29,31,0.07)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-[#fffaf2] hover:text-[#1d1d1f] active:translate-y-0"
-        >
-          ← Tours
-        </a>
+  <main class="app-main">
+    @if (isLoadingTour()) {
+      <section class="loading-state">
+        <p>Loading tour...</p>
+      </section>
+    } @else if (tour(); as selectedTour) {
+      <section class="top-actions">
+        <a routerLink="/tours" class="btn btn--ghost btn--small"> ← Tours </a>
 
-        <button
-          class="h-12 rounded-2xl bg-[#1d1d1f] px-5 text-[11px] font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_45px_rgba(29,29,31,0.20)] transition hover:-translate-y-0.5 hover:bg-black active:translate-y-0"
-          type="button"
-          (click)="openEditTourModal()"
-        >
+        <button class="btn btn--dark btn--small" type="button" (click)="openEditTourModal()">
           Edit
         </button>
       </section>
 
-      <section class="border-b border-black/[0.075] pb-10">
-        <div
-          class="mb-7 inline-flex items-center gap-2 rounded-full border border-black/[0.07] bg-[#f8f4ec]/76 px-3 py-2 shadow-[0_14px_38px_rgba(29,29,31,0.07)] backdrop-blur-xl"
-        >
-          <span class="relative flex h-2 w-2">
-            <span
-              class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#4f7cff]/30"
-            ></span>
-            <span class="relative inline-flex h-2 w-2 rounded-full bg-[#4f7cff]"></span>
-          </span>
+      @if (pageErrorMessage()) {
+        <div class="alert alert--error">
+          <p>{{ pageErrorMessage() }}</p>
+        </div>
+      }
 
-          <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]">
-            Route detail
-          </span>
+      <section class="detail-hero">
+        <div class="eyebrow">
+          <span class="eyebrow__dot"></span>
+          <span class="eyebrow__text">Route detail</span>
         </div>
 
-        <h1
-          class="max-w-5xl text-[clamp(4rem,9vw,8rem)] font-bold leading-[0.84] tracking-[-0.095em] text-[#1d1d1f]"
-        >
+        <h1 class="hero-title">
           {{ selectedTour.name }}
         </h1>
 
-        <p class="mt-7 max-w-2xl text-base leading-8 text-[#6b665f] sm:text-lg">
+        <p class="hero-text">
           {{
             selectedTour.description ||
               'No description added yet. Keep notes, context or purpose for this route here.'
           }}
         </p>
 
-        <div
-          class="mt-10 overflow-hidden rounded-[1.75rem] border border-black/[0.075] bg-[#f8f4ec]/76 shadow-[0_24px_70px_rgba(29,29,31,0.09)] backdrop-blur-2xl"
-        >
-          <div
-            class="grid divide-y divide-black/[0.06] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-6"
-          >
-            <div class="px-5 py-4">
-              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#817b72]">From</p>
-              <p class="mt-2 truncate text-base font-bold tracking-[-0.04em] text-[#1d1d1f]">
-                {{ selectedTour.from }}
+        <div class="info-grid">
+          <div class="info-grid__inner">
+            <div class="info-cell">
+              <p class="info-cell__label">From</p>
+              <p class="info-cell__value">{{ selectedTour.from }}</p>
+            </div>
+
+            <div class="info-cell">
+              <p class="info-cell__label">To</p>
+              <p class="info-cell__value">{{ selectedTour.to }}</p>
+            </div>
+
+            <div class="info-cell">
+              <p class="info-cell__label">Type</p>
+              <p class="info-cell__value">
+                {{ getTransportLabel(selectedTour.transportType) }}
               </p>
             </div>
 
-            <div class="px-5 py-4">
-              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#817b72]">To</p>
-              <p class="mt-2 truncate text-base font-bold tracking-[-0.04em] text-[#1d1d1f]">
-                {{ selectedTour.to }}
+            <div class="info-cell">
+              <p class="info-cell__label">Distance</p>
+              <p class="info-cell__value">
+                {{ formatTourDistance(selectedTour.distance) }}
               </p>
             </div>
 
-            <div class="px-5 py-4">
-              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#817b72]">Date</p>
-              <p class="mt-2 text-base font-bold tracking-[-0.04em] text-[#1d1d1f]">
-                {{ formatDate(selectedTour.plannedDate) }}
+            <div class="info-cell">
+              <p class="info-cell__label">Time</p>
+              <p class="info-cell__value">
+                {{ formatDuration(selectedTour.estimatedTime) }}
               </p>
             </div>
 
-            <div class="px-5 py-4">
-              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#817b72]">Type</p>
-              <p class="mt-2 text-base font-bold tracking-[-0.04em] text-[#1d1d1f]">
-                {{ selectedTour.transportType }}
-              </p>
+            <div class="info-cell">
+              <p class="info-cell__label">Popularity</p>
+              <p class="info-cell__value">{{ selectedTour.popularity }} logs</p>
             </div>
 
-            <div class="px-5 py-4">
-              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#817b72]">
-                Distance
-              </p>
-              <p class="mt-2 text-base font-bold tracking-[-0.04em] text-[#1d1d1f]">
-                {{ selectedTour.distance }} km
-              </p>
-            </div>
-
-            <div class="px-5 py-4">
-              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#817b72]">Time</p>
-              <p class="mt-2 text-base font-bold tracking-[-0.04em] text-[#1d1d1f]">
-                {{ selectedTour.estimatedTime }} min
+            <div class="info-cell">
+              <p class="info-cell__label">Child-friendly</p>
+              <p class="info-cell__value">
+                {{ selectedTour.childFriendliness || 'Unknown' }}
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="mt-8">
-        <app-map-placeholder
+      <section class="content-card">
+        <app-route-map
           [from]="selectedTour.from"
           [to]="selectedTour.to"
           [transportType]="selectedTour.transportType"
           [distance]="selectedTour.distance"
           [estimatedTime]="selectedTour.estimatedTime"
+          [routeInformation]="selectedTour.routeInformation"
         />
       </section>
 
-      <section class="mt-10">
-        <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <section>
+        <div class="section-head">
           <div>
-            <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]">
-              Tour history
-            </p>
-
-            <h2 class="mt-2 text-5xl font-bold tracking-[-0.085em] text-[#1d1d1f]">Logs.</h2>
+            <p class="section-kicker">Tour history</p>
+            <h2 class="section-title">Logs.</h2>
           </div>
 
-          <button
-            class="h-12 rounded-2xl bg-[#006435] px-5 text-[11px] font-bold uppercase tracking-[0.16em] text-white shadow-[0_14px_35px_rgba(29,29,31,0.18)] transition hover:-translate-y-0.5 hover:bg-[#05a75b] active:translate-y-0"
-            type="button"
-            (click)="openNewLogModal()"
-          >
+          <button class="btn btn--success" type="button" (click)="openNewLogModal()">
             Add log
           </button>
         </div>
 
-        @if (logs().length === 0) {
-          <section
-            class="grid min-h-[18rem] place-items-center rounded-[2rem] border border-black/[0.075] bg-[#f8f4ec]/72 p-8 text-center shadow-[0_26px_80px_rgba(29,29,31,0.09)] backdrop-blur-2xl"
-          >
-            <div class="max-w-sm">
-              <div
-                class="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-3xl border border-black/[0.07] bg-[#ebe6dc] text-3xl text-[#1d1d1f] shadow-[0_18px_50px_rgba(29,29,31,0.08)]"
-              >
-                +
-              </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <p class="stat-card__label">Average rating</p>
+            <p class="stat-card__value">{{ averageRating() }}/5</p>
+          </div>
 
-              <p class="text-4xl font-bold tracking-[-0.08em] text-[#1d1d1f]">No logs yet.</p>
+          <div class="stat-card">
+            <p class="stat-card__label">Logged distance</p>
+            <p class="stat-card__value">
+              {{ formatLogDistance(totalLoggedDistance()) }}
+            </p>
+          </div>
 
-              <p class="mt-4 text-sm leading-6 text-[#6b665f]">
-                Add your first note after completing this route.
-              </p>
+          <div class="stat-card">
+            <p class="stat-card__label">Logged time</p>
+            <p class="stat-card__value">
+              {{ formatMinutes(totalLoggedTimeInMinutes()) }}
+            </p>
+          </div>
+        </div>
+
+        @if (isLoadingLogs()) {
+          <section class="loading-state">
+            <p>Loading logs...</p>
+          </section>
+        } @else if (logs().length === 0) {
+          <section class="empty-state">
+            <div>
+              <div class="empty-state__icon">+</div>
+
+              <h2>No logs yet.</h2>
+
+              <p>Add your first note after completing this route.</p>
             </div>
           </section>
         } @else {
-          <section
-            class="overflow-hidden rounded-[2rem] border border-black/[0.075] bg-[#f8f4ec]/76 shadow-[0_30px_95px_rgba(29,29,31,0.11)] backdrop-blur-2xl"
-          >
-            <div
-              class="hidden grid-cols-[1.25fr_1fr_0.7fr_0.8fr_auto] gap-4 border-b border-black/[0.065] bg-[#eee7da]/62 px-5 py-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#817b72] lg:grid"
-            >
+          <section class="table-panel">
+            <div class="table-head table-head--logs">
               <p>Log</p>
               <p>Date</p>
               <p>Rating</p>
               <p>Effort</p>
-              <p class="text-right">Actions</p>
+              <p>Actions</p>
             </div>
 
-            <div class="divide-y divide-black/[0.06]">
+            <div class="table-body">
               @for (log of logs(); track log.id) {
-                <article
-                  class="grid gap-5 px-5 py-5 transition hover:bg-[#fffaf2]/72 lg:grid-cols-[1.25fr_1fr_0.7fr_0.8fr_auto] lg:items-center"
-                >
-                  <div class="min-w-0">
-                    <h3 class="truncate text-xl font-bold tracking-[-0.055em] text-[#1d1d1f]">
-                      {{ log.comment }}
-                    </h3>
+                <article class="data-row log-row">
+                  <div class="log-row__main">
+                    <div class="min-w-0">
+                      <h3 class="row-title">
+                        {{ log.comment }}
+                      </h3>
 
-                    <p class="mt-1 text-sm leading-6 text-[#6b665f] lg:hidden">
-                      {{ formatDateTime(log.date) }}
-                    </p>
+                      <p class="row-text mobile-only md:hidden">
+                        {{ formatDateTime(log.dateTime) }}
+                      </p>
+                    </div>
                   </div>
 
-                  <p class="hidden text-sm font-semibold text-[#6b665f] lg:block">
-                    {{ formatDateTime(log.date) }}
+                  <p class="row-text row-muted hidden md:block">
+                    {{ formatDateTime(log.dateTime) }}
                   </p>
 
-                  <p class="text-sm font-bold text-[#1d1d1f]">{{ log.rating }}/5</p>
+                  <p class="row-text row-text--strong">{{ log.rating }}/5</p>
 
-                  <p class="text-sm font-semibold text-[#6b665f]">
-                    {{ log.difficulty }}/5 · {{ log.totalDistance }} km · {{ log.totalTime }} min
+                  <p class="row-text">
+                    {{ log.difficulty }} · {{ formatLogDistance(log.totalDistance) }} ·
+                    {{ formatDuration(log.totalTime) }}
                   </p>
 
-                  <div class="flex gap-2 lg:justify-end">
-                    <button
-                      class="grid h-11 place-items-center rounded-2xl bg-[#1d1d1f] px-4 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow-[0_12px_30px_rgba(29,29,31,0.14)] transition hover:bg-black"
-                      type="button"
-                      (click)="editLog(log)"
-                    >
+                  <div class="data-actions">
+                    <button class="btn btn--dark btn--small" type="button" (click)="editLog(log)">
                       Edit
                     </button>
 
                     <button
-                      class="grid h-11 place-items-center rounded-2xl border border-red-500/20 bg-red-50 px-5 text-xs font-extrabold uppercase tracking-[0.06em] text-red-700 shadow-[0_10px_26px_rgba(220,38,38,0.08)] transition hover:-translate-y-0.5 hover:border-red-500/30 hover:bg-red-100 hover:text-red-800 hover:shadow-[0_14px_34px_rgba(220,38,38,0.14)] active:translate-y-0"
+                      class="btn btn--danger btn--small"
                       type="button"
                       (click)="deleteLog(log.id)"
                     >
@@ -235,45 +207,31 @@
       </section>
 
       @if (isEditTourModalOpen()) {
-        <section
-          class="fixed inset-0 z-[60] grid place-items-center overflow-y-auto bg-[#1d1d1f]/28 px-4 py-6 backdrop-blur-xl"
-        >
-          <div
-            class="w-full max-w-2xl overflow-hidden rounded-[2.4rem] border border-white/50 bg-[#f8f4ec]/78 p-2 shadow-[0_44px_130px_rgba(29,29,31,0.24)] backdrop-blur-2xl"
-          >
-            <div
-              class="relative overflow-hidden rounded-[2rem] border border-black/[0.06] bg-[#fffaf2]/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
-            >
-              <div
-                class="relative flex items-start justify-between gap-5 border-b border-black/[0.06] px-6 py-5"
-              >
+        <section class="modal-backdrop">
+          <div class="modal-shell">
+            <div class="modal-card">
+              <div class="modal-header">
                 <div>
-                  <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#817b72]">
-                    Edit tour
-                  </p>
-
-                  <h2 class="mt-2 text-4xl font-bold tracking-[-0.075em] text-[#1d1d1f]">Update</h2>
+                  <p class="modal-kicker">Edit tour</p>
+                  <h2 class="modal-title">Update</h2>
                 </div>
 
                 <button
-                  class="grid h-11 w-11 place-items-center rounded-2xl border border-black/[0.07] bg-[#f8f4ec]/76 text-xl font-bold text-[#1d1d1f] shadow-[0_12px_34px_rgba(29,29,31,0.06)] transition hover:bg-[#1d1d1f] hover:text-white"
+                  class="modal-close"
                   type="button"
                   (click)="closeEditTourModal()"
+                  aria-label="Close modal"
                 >
                   ×
                 </button>
               </div>
 
-              <form class="relative grid gap-5 p-6 sm:grid-cols-2" (ngSubmit)="saveTour()">
-                <label class="block sm:col-span-2">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Name *
-                  </span>
+              <form class="form-grid" (ngSubmit)="saveTour()">
+                <label class="form-field form-field--wide">
+                  <span class="form-label">Name *</span>
 
                   <input
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#4f7cff]/35 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#4f7cff]/10"
+                    class="field"
                     type="text"
                     name="name"
                     [ngModel]="name()"
@@ -281,15 +239,11 @@
                   />
                 </label>
 
-                <label class="block">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    From *
-                  </span>
+                <label class="form-field">
+                  <span class="form-label">From *</span>
 
                   <input
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#d7a86e]/45 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#d7a86e]/12"
+                    class="field"
                     type="text"
                     name="from"
                     [ngModel]="from()"
@@ -297,15 +251,11 @@
                   />
                 </label>
 
-                <label class="block">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    To *
-                  </span>
+                <label class="form-field">
+                  <span class="form-label">To *</span>
 
                   <input
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#7a9f7a]/40 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#7a9f7a]/10"
+                    class="field"
                     type="text"
                     name="to"
                     [ngModel]="to()"
@@ -313,50 +263,28 @@
                   />
                 </label>
 
-                <label class="block">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Date *
-                  </span>
-
-                  <input
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#4f7cff]/35 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#4f7cff]/10"
-                    type="date"
-                    name="plannedDate"
-                    [ngModel]="plannedDate()"
-                    (ngModelChange)="plannedDate.set($event)"
-                  />
-                </label>
-
-                <label class="block">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Transport
-                  </span>
+                <label class="form-field form-field--wide">
+                  <span class="form-label">Transport</span>
 
                   <select
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#1d1d1f]/20 focus:bg-[#fffaf2] focus:ring-4 focus:ring-black/[0.04]"
+                    class="field"
                     name="transportType"
                     [ngModel]="transportType()"
                     (ngModelChange)="setTransportType($event)"
                   >
                     @for (type of transportTypes; track type) {
-                      <option [value]="type">{{ type }}</option>
+                      <option [value]="type">
+                        {{ getTransportLabel(type) }}
+                      </option>
                     }
                   </select>
                 </label>
 
-                <label class="block sm:col-span-2">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Description
-                  </span>
+                <label class="form-field form-field--wide">
+                  <span class="form-label">Description</span>
 
                   <textarea
-                    class="min-h-28 w-full resize-none rounded-[1.65rem] border border-black/[0.075] bg-[#ebe6dc]/80 px-4 py-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#4f7cff]/35 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#4f7cff]/10"
+                    class="field"
                     name="description"
                     [ngModel]="description()"
                     (ngModelChange)="description.set($event)"
@@ -364,29 +292,23 @@
                 </label>
 
                 @if (tourErrorMessage()) {
-                  <div
-                    class="rounded-2xl border border-red-500/10 bg-red-50 px-4 py-3 sm:col-span-2"
-                  >
-                    <p class="text-sm font-semibold leading-6 text-red-600">
-                      {{ tourErrorMessage() }}
-                    </p>
+                  <div class="alert alert--error">
+                    <p>{{ tourErrorMessage() }}</p>
                   </div>
                 }
 
-                <div class="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
+                <div class="form-actions">
                   <button
-                    class="flex-1 rounded-2xl border border-black/[0.07] bg-[#d4cec1] px-6 py-4 text-xs font-extrabold uppercase tracking-[0.18em] text-[#666360] transition hover:bg-[#960000] hover:text-[#ffffff]"
+                    class="btn btn--soft-danger"
                     type="button"
                     (click)="closeEditTourModal()"
+                    [disabled]="isSavingTour()"
                   >
                     Cancel
                   </button>
 
-                  <button
-                    class="flex-1 rounded-2xl bg-[#006435] px-6 py-4 text-xs font-bold uppercase tracking-[0.18em] text-white shadow-[0_18px_45px_rgba(29,29,31,0.18)] transition hover:-translate-y-0.5 hover:bg-[#05a75b] active:translate-y-0"
-                    type="submit"
-                  >
-                    Save
+                  <button class="btn btn--success" type="submit" [disabled]="isSavingTour()">
+                    {{ isSavingTour() ? 'Saving...' : 'Save' }}
                   </button>
                 </div>
               </form>
@@ -396,47 +318,33 @@
       }
 
       @if (isLogModalOpen()) {
-        <section
-          class="fixed inset-0 z-[60] grid place-items-center overflow-y-auto bg-[#1d1d1f]/28 px-4 py-6 backdrop-blur-xl"
-        >
-          <div
-            class="w-full max-w-2xl overflow-hidden rounded-[2.4rem] border border-white/50 bg-[#f8f4ec]/78 p-2 shadow-[0_44px_130px_rgba(29,29,31,0.24)] backdrop-blur-2xl"
-          >
-            <div
-              class="relative overflow-hidden rounded-[2rem] border border-black/[0.06] bg-[#fffaf2]/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
-            >
-              <div
-                class="relative flex items-start justify-between gap-5 border-b border-black/[0.06] px-6 py-5"
-              >
+        <section class="modal-backdrop">
+          <div class="modal-shell">
+            <div class="modal-card">
+              <div class="modal-header">
                 <div>
-                  <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#817b72]">
-                    Tour log
-                  </p>
-
-                  <h2 class="mt-2 text-4xl font-bold tracking-[-0.075em] text-[#1d1d1f]">
+                  <p class="modal-kicker">Tour log</p>
+                  <h2 class="modal-title">
                     {{ editingLogId() ? 'Edit log' : 'Add log' }}
                   </h2>
                 </div>
 
                 <button
-                  class="grid h-11 w-11 place-items-center rounded-2xl border border-black/[0.07] bg-[#f8f4ec]/76 text-xl font-bold text-[#1d1d1f] shadow-[0_12px_34px_rgba(29,29,31,0.06)] transition hover:bg-[#1d1d1f] hover:text-white"
+                  class="modal-close"
                   type="button"
                   (click)="closeLogModal()"
+                  aria-label="Close modal"
                 >
                   ×
                 </button>
               </div>
 
-              <form class="relative grid gap-5 p-6 sm:grid-cols-2" (ngSubmit)="saveLog()">
-                <label class="block sm:col-span-2">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Date *
-                  </span>
+              <form class="form-grid" (ngSubmit)="saveLog()">
+                <label class="form-field form-field--wide">
+                  <span class="form-label">Date *</span>
 
                   <input
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#4f7cff]/35 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#4f7cff]/10"
+                    class="field"
                     type="datetime-local"
                     name="logDate"
                     [ngModel]="logDate()"
@@ -444,15 +352,11 @@
                   />
                 </label>
 
-                <label class="block sm:col-span-2">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Comment *
-                  </span>
+                <label class="form-field form-field--wide">
+                  <span class="form-label">Comment *</span>
 
                   <textarea
-                    class="min-h-28 w-full resize-none rounded-[1.65rem] border border-black/[0.075] bg-[#ebe6dc]/80 px-4 py-4 text-sm font-semibold text-[#1d1d1f] outline-none transition placeholder:text-[#9b958c] hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#4f7cff]/35 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#4f7cff]/10"
+                    class="field"
                     name="logComment"
                     [ngModel]="logComment()"
                     (ngModelChange)="logComment.set($event)"
@@ -460,33 +364,28 @@
                   ></textarea>
                 </label>
 
-                <label class="block">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Difficulty 1-5
-                  </span>
+                <label class="form-field">
+                  <span class="form-label">Difficulty</span>
 
-                  <input
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#d7a86e]/45 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#d7a86e]/12"
-                    type="number"
-                    min="1"
-                    max="5"
+                  <select
+                    class="field"
                     name="logDifficulty"
                     [ngModel]="logDifficulty()"
-                    (ngModelChange)="logDifficulty.set(+$event)"
-                  />
+                    (ngModelChange)="setDifficulty($event)"
+                  >
+                    @for (difficulty of difficulties; track difficulty) {
+                      <option [value]="difficulty">
+                        {{ difficulty }}
+                      </option>
+                    }
+                  </select>
                 </label>
 
-                <label class="block">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Rating 1-5
-                  </span>
+                <label class="form-field">
+                  <span class="form-label">Rating 1-5</span>
 
                   <input
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#7a9f7a]/40 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#7a9f7a]/10"
+                    class="field"
                     type="number"
                     min="1"
                     max="5"
@@ -496,15 +395,11 @@
                   />
                 </label>
 
-                <label class="block">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Distance km
-                  </span>
+                <label class="form-field">
+                  <span class="form-label">Distance km</span>
 
                   <input
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#4f7cff]/35 focus:bg-[#fffaf2] focus:ring-4 focus:ring-[#4f7cff]/10"
+                    class="field"
                     type="number"
                     min="1"
                     name="logDistance"
@@ -513,47 +408,37 @@
                   />
                 </label>
 
-                <label class="block">
-                  <span
-                    class="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#817b72]"
-                  >
-                    Time min
-                  </span>
+                <label class="form-field">
+                  <span class="form-label">Time min</span>
 
                   <input
-                    class="h-14 w-full rounded-2xl border border-black/[0.075] bg-[#ebe6dc]/80 px-4 text-sm font-semibold text-[#1d1d1f] outline-none transition hover:border-black/[0.12] hover:bg-[#fffaf2] focus:border-[#1d1d1f]/20 focus:bg-[#fffaf2] focus:ring-4 focus:ring-black/[0.04]"
+                    class="field"
                     type="number"
                     min="1"
                     name="logTime"
-                    [ngModel]="logTime()"
-                    (ngModelChange)="logTime.set(+$event)"
+                    [ngModel]="logTimeInMinutes()"
+                    (ngModelChange)="logTimeInMinutes.set(+$event)"
                   />
                 </label>
 
                 @if (logErrorMessage()) {
-                  <div
-                    class="rounded-2xl border border-red-500/10 bg-red-50 px-4 py-3 sm:col-span-2"
-                  >
-                    <p class="text-sm font-semibold leading-6 text-red-600">
-                      {{ logErrorMessage() }}
-                    </p>
+                  <div class="alert alert--error">
+                    <p>{{ logErrorMessage() }}</p>
                   </div>
                 }
 
-                <div class="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
+                <div class="form-actions">
                   <button
-                    class="flex-1 rounded-2xl border border-black/[0.07] bg-[#d4cec1] px-6 py-4 text-xs font-extrabold uppercase tracking-[0.18em] text-[#666360] transition hover:bg-[#960000] hover:text-[#ffffff]"
+                    class="btn btn--soft-danger"
                     type="button"
                     (click)="closeLogModal()"
+                    [disabled]="isSavingLog()"
                   >
                     Cancel
                   </button>
 
-                  <button
-                    class="flex-1 rounded-2xl bg-[#006435] px-6 py-4 text-xs font-bold uppercase tracking-[0.18em] text-white shadow-[0_18px_45px_rgba(29,29,31,0.18)] transition hover:-translate-y-0.5 hover:bg-[#05a75b] active:translate-y-0"
-                    type="submit"
-                  >
-                    Save
+                  <button class="btn btn--success" type="submit" [disabled]="isSavingLog()">
+                    {{ isSavingLog() ? 'Saving...' : 'Save' }}
                   </button>
                 </div>
               </form>
@@ -562,16 +447,15 @@
         </section>
       }
     } @else {
-      <section class="grid min-h-[60dvh] place-items-center text-center">
+      <section class="not-found">
         <div>
-          <p class="text-5xl font-bold tracking-[-0.09em] text-[#1d1d1f]">Tour not found.</p>
+          <h1>Tour not found.</h1>
 
-          <a
-            routerLink="/tours"
-            class="mt-6 inline-flex h-14 items-center rounded-2xl bg-[#1d1d1f] px-6 text-xs font-bold uppercase tracking-[0.18em] text-white shadow-[0_18px_45px_rgba(29,29,31,0.18)] transition hover:-translate-y-0.5 hover:bg-black active:translate-y-0"
-          >
-            Back to tours
-          </a>
+          @if (pageErrorMessage()) {
+            <p>{{ pageErrorMessage() }}</p>
+          }
+
+          <a routerLink="/tours" class="btn btn--dark"> Back to tours </a>
         </div>
       </section>
     }

@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using TourPlanner.Business.Interfaces;
@@ -37,6 +38,7 @@ public class OpenRouteServiceClient : IRouteService
             $"&end={FormatCoordinate(toCoordinates.Longitude)},{FormatCoordinate(toCoordinates.Latitude)}";
 
         HttpResponseMessage directionsHttpResponse = await httpClient.GetAsync(directionsUrl);
+
         if (!directionsHttpResponse.IsSuccessStatusCode)
         {
             if (directionsHttpResponse.StatusCode is System.Net.HttpStatusCode.BadRequest or System.Net.HttpStatusCode.NotFound)
@@ -48,24 +50,41 @@ public class OpenRouteServiceClient : IRouteService
                 $"OpenRouteService directions request failed with status {(int)directionsHttpResponse.StatusCode}.");
         }
 
-        DirectionsResponse? directionsResponse = await directionsHttpResponse.Content.ReadFromJsonAsync<DirectionsResponse>();
+        DirectionsResponse? directionsResponse =
+            await directionsHttpResponse.Content.ReadFromJsonAsync<DirectionsResponse>();
 
-        RouteSummary? summary = directionsResponse?.Features?.FirstOrDefault()?.Properties?.Summary;
+        DirectionsFeature? firstFeature = directionsResponse?.Features?.FirstOrDefault();
+
+        RouteSummary? summary = firstFeature?.Properties?.Summary;
+
         if (summary is null)
         {
             throw new ArgumentException($"No route could be found between '{from}' and '{to}'.");
         }
 
+        if (firstFeature?.Geometry?.Coordinates is null || firstFeature.Geometry.Coordinates.Length == 0)
+        {
+            throw new ArgumentException($"No route geometry could be found between '{from}' and '{to}'.");
+        }
+
         TimeSpan duration = TimeSpan.FromSeconds(summary.Duration);
-        string durationText = duration.Days > 0
-            ? $"{duration.Days}d {duration:hh\\:mm\\:ss}"
-            : duration.ToString(@"hh\:mm\:ss");
+
+        string routeGeometryJson = JsonSerializer.Serialize(
+            new RouteGeometryDto
+            {
+                Type = firstFeature.Geometry.Type,
+                Coordinates = firstFeature.Geometry.Coordinates,
+            },
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            });
 
         return new RouteResult
         {
             DistanceMeters = summary.Distance,
             Duration = duration,
-            RouteInformation = $"Distance: {summary.Distance / 1000:F2} km, Duration: {durationText}"
+            RouteInformation = routeGeometryJson,
         };
     }
 
@@ -78,6 +97,7 @@ public class OpenRouteServiceClient : IRouteService
             "&size=1";
 
         HttpResponseMessage geocodeHttpResponse = await httpClient.GetAsync(geocodeUrl);
+
         if (!geocodeHttpResponse.IsSuccessStatusCode)
         {
             if (geocodeHttpResponse.StatusCode is System.Net.HttpStatusCode.BadRequest or System.Net.HttpStatusCode.NotFound)
@@ -89,9 +109,11 @@ public class OpenRouteServiceClient : IRouteService
                 $"OpenRouteService geocoding request failed with status {(int)geocodeHttpResponse.StatusCode}.");
         }
 
-        GeocodeResponse? geocodeResponse = await geocodeHttpResponse.Content.ReadFromJsonAsync<GeocodeResponse>();
+        GeocodeResponse? geocodeResponse =
+            await geocodeHttpResponse.Content.ReadFromJsonAsync<GeocodeResponse>();
 
         double[]? coordinates = geocodeResponse?.Features?.FirstOrDefault()?.Geometry?.Coordinates;
+
         if (coordinates is null || coordinates.Length < 2)
         {
             throw new ArgumentException($"Location '{address}' could not be found.");
@@ -111,7 +133,7 @@ public class OpenRouteServiceClient : IRouteService
             TransportType.Hike => "foot-hiking",
             TransportType.Running => "foot-walking",
             TransportType.Vacation => "driving-car",
-            _ => "driving-car"
+            _ => "driving-car",
         };
     }
 
@@ -143,6 +165,9 @@ public class OpenRouteServiceClient : IRouteService
     {
         [JsonPropertyName("properties")]
         public DirectionsProperties? Properties { get; set; }
+
+        [JsonPropertyName("geometry")]
+        public DirectionsGeometry? Geometry { get; set; }
     }
 
     private class DirectionsProperties
@@ -158,5 +183,21 @@ public class OpenRouteServiceClient : IRouteService
 
         [JsonPropertyName("duration")]
         public double Duration { get; set; }
+    }
+
+    private class DirectionsGeometry
+    {
+        [JsonPropertyName("type")]
+        public string Type { get; set; } = "LineString";
+
+        [JsonPropertyName("coordinates")]
+        public double[][] Coordinates { get; set; } = [];
+    }
+
+    private class RouteGeometryDto
+    {
+        public string Type { get; set; } = "LineString";
+
+        public double[][] Coordinates { get; set; } = [];
     }
 }

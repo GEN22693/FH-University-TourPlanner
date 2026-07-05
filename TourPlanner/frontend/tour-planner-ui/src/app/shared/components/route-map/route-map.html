@@ -1,0 +1,16 @@
+<section class="map-card">
+  <div class="map-stage">
+    <div #mapContainer class="map-canvas"></div>
+
+    <div class="map-chip">
+      <span class="map-chip__dot"></span>
+      <span class="map-chip__text">Route map</span>
+    </div>
+
+    <div class="map-summary">
+      <span>{{ transportType() }}</span>
+      <span>{{ formatTourDistance(distance()) }}</span>
+      <span>{{ formatDuration(estimatedTime()) }}</span>
+    </div>
+  </div>
+</section>
