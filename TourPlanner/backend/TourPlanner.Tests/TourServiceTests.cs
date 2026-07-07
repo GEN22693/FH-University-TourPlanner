@@ -23,11 +23,9 @@ public class TourServiceTests
         tourService = new TourService(tourRepositoryMock.Object, routeServiceMock.Object);
     }
 
-    // Test 1: CreateTourAsync ruft ORS auf und speichert mit echten Route-Daten
     [Test]
     public async Task CreateTourAsync_CallsRouteService_AndSavesToRepository()
     {
-        // Arrange
         var createDto = new CreateTourDto
         {
             Name = "Vienna to Prague",
@@ -60,20 +58,16 @@ public class TourServiceTests
         tourRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<Tour>()))
             .ReturnsAsync(savedTour);
 
-        // Act
         var result = await tourService.CreateTourAsync(createDto, userId: 1);
 
-        // Assert
         Assert.That(result.Distance, Is.EqualTo(330000));
         Assert.That(result.EstimatedTime, Is.EqualTo(TimeSpan.FromHours(3.5)));
         Assert.That(result.RouteInformation, Is.EqualTo("Distance: 330.00 km, Duration: 03:30:00"));
 
-        // Verify: RouteService wurde mit richtigen Parametern aufgerufen
         routeServiceMock.Verify(
             r => r.GetRouteAsync("Vienna", "Prague", TransportType.Vacation),
             Times.Once);
 
-        // Verify: Repository wurde mit Tour aufgerufen die Distance von ORS enthält
         tourRepositoryMock.Verify(
             r => r.CreateAsync(It.Is<Tour>(t =>
                 t.Distance == 330000 &&
@@ -82,11 +76,9 @@ public class TourServiceTests
             Times.Once);
     }
 
-    // Test 2: UpdateTourAsync recalculated Route wenn From/To sich ändern
     [Test]
     public async Task UpdateTourAsync_RecalculatesRoute_WhenFromToChanges()
     {
-        // Arrange
         var existingTour = new Tour
         {
             Id = 5,
@@ -135,24 +127,19 @@ public class TourServiceTests
             Description = "Updated trip"
         };
 
-        // Act
         var result = await tourService.UpdateTourAsync(5, updateDto, 1);
 
-        // Assert - neue Route wurde berechnet
-        Assert.That(result.Distance, Is.EqualTo(560000)); // nicht mehr 200000
+        Assert.That(result.Distance, Is.EqualTo(560000));
         Assert.That(result.EstimatedTime, Is.EqualTo(TimeSpan.FromHours(5.5)));
 
-        // Verify: ORS wurde aufgerufen mit NEUEN Koordinaten
         routeServiceMock.Verify(
             r => r.GetRouteAsync("Vienna", "Munich", TransportType.Vacation),
             Times.Once);
     }
 
-    // Test 3: GetAllToursAsync mappt Entities zu DTOs
     [Test]
     public async Task GetAllToursAsync_MapsEntitiesToDtos_AndReturnsAll()
     {
-        // Arrange
         var toursFromDb = new[]
         {
             new Tour { Id = 1, UserId = 1, Name = "Alpine Hike", Distance = 25000, From = "Vienna", To = "Graz" },
@@ -162,10 +149,8 @@ public class TourServiceTests
         tourRepositoryMock.Setup(r => r.GetAllAsync(1))
             .ReturnsAsync(toursFromDb);
 
-        // Act
         var result = await tourService.GetAllToursAsync(1);
 
-        // Assert
         var resultList = result.ToList();
         Assert.That(resultList.Count, Is.EqualTo(2));
         Assert.That(resultList[0].Name, Is.EqualTo("Alpine Hike"));
@@ -173,26 +158,20 @@ public class TourServiceTests
         Assert.That(resultList[0].From, Is.EqualTo("Vienna"));
     }
 
-    // Test 4: GetTourByIdAsync gibt null zurück wenn Tour nicht existiert
     [Test]
     public async Task GetTourByIdAsync_ReturnsNull_WhenTourDoesNotExist()
     {
-        // Arrange
         tourRepositoryMock.Setup(r => r.GetByIdAsync(999, 1))
             .ReturnsAsync((Tour?)null);
 
-        // Act
         var result = await tourService.GetTourByIdAsync(999, 1);
 
-        // Assert
         Assert.That(result, Is.Null);
     }
 
-    // Test 5: GetTourByIdAsync gibt DTO zurück wenn Tour existiert
     [Test]
     public async Task GetTourByIdAsync_ReturnsDtoWithCorrectData_WhenTourExists()
     {
-        // Arrange
         var existingTour = new Tour
         {
             Id = 42,
@@ -207,57 +186,43 @@ public class TourServiceTests
         tourRepositoryMock.Setup(r => r.GetByIdAsync(42, 1))
             .ReturnsAsync(existingTour);
 
-        // Act
         var result = await tourService.GetTourByIdAsync(42, 1);
 
-        // Assert
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.Id, Is.EqualTo(42));
         Assert.That(result.Name, Is.EqualTo("Mountain Tour"));
         Assert.That(result.Distance, Is.EqualTo(150000));
     }
 
-    // Test 6: DeleteTourAsync gibt true zurück wenn erfolgreich
     [Test]
     public async Task DeleteTourAsync_ReturnsTrue_WhenTourIsDeleted()
     {
-        // Arrange
         tourRepositoryMock.Setup(r => r.DeleteAsync(7, 1))
             .ReturnsAsync(true);
 
-        // Act
         var result = await tourService.DeleteTourAsync(7, 1);
 
-        // Assert
         Assert.That(result, Is.True);
 
-        // Verify: Repository wurde aufgerufen mit Tour ID und User ID
         tourRepositoryMock.Verify(r => r.DeleteAsync(7, 1), Times.Once);
     }
 
-    // Test 7: DeleteTourAsync gibt false zurück wenn Tour nicht gehört zu User
     [Test]
     public async Task DeleteTourAsync_ReturnsFalse_WhenTourNotFoundForUser()
     {
-        // Arrange
         tourRepositoryMock.Setup(r => r.DeleteAsync(99, 1))
-            .ReturnsAsync(false); // Repository sagt: nicht gefunden/nicht dein
+            .ReturnsAsync(false);
 
-        // Act
         var result = await tourService.DeleteTourAsync(99, 1);
 
-        // Assert
-        Assert.That(result, Is.False); // Sicherheit: User sieht nicht "nicht gefunden" vs "nicht dein"
+        Assert.That(result, Is.False);
     }
 
-
-    // Test 10: UpdateTourAsync gibt null zurück wenn Tour nicht gehört zu User (Ownership)
     [Test]
     public async Task UpdateTourAsync_ReturnsNull_WhenTourNotFoundForUser()
     {
-        // Arrange - User 99 versucht Tour von User 1 zu editieren
         tourRepositoryMock.Setup(r => r.GetByIdAsync(5, 99))
-            .ReturnsAsync((Tour?)null); // Tour existiert nicht für diesen User
+            .ReturnsAsync((Tour?)null);
 
         var updateDto = new UpdateTourDto
         {
@@ -267,35 +232,26 @@ public class TourServiceTests
             TransportType = TransportType.Vacation
         };
 
-        // Act
         var result = await tourService.UpdateTourAsync(5, updateDto, 99);
 
-        // Assert
-        Assert.That(result, Is.Null); // Sicherheit: gibt null statt Exception/Error-Details
+        Assert.That(result, Is.Null);
 
-        // Verify: RouteService wurde NICHT aufgerufen (nicht autorisiert)
         routeServiceMock.Verify(r => r.GetRouteAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TransportType>()), Times.Never);
     }
 
-    // Test 11: UpdateTourAsync throwt Exception bei ungültigen Input-Daten
     [Test]
     public void UpdateTourAsync_ThrowsArgumentException_WhenFromIsEmpty()
     {
-        // Arrange
         var invalidDto = new UpdateTourDto { Name = "Tour", From = "", To = "Prague", TransportType = TransportType.Vacation };
 
-        // Act & Assert
         Assert.ThrowsAsync<ArgumentException>(() => tourService.UpdateTourAsync(5, invalidDto, 1));
 
-        // Verify: RouteService wurde nicht aufgerufen (Validation war vorher)
         routeServiceMock.Verify(r => r.GetRouteAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TransportType>()), Times.Never);
     }
 
-    // Test 12: CreateTourAsync mit verschiedenen TransportTypes mappt zu richtigen Profilen
     [Test]
     public async Task CreateTourAsync_HandlesDifferentTransportTypes()
     {
-        // Arrange - Test dass Service TransportType richtig an ORS weitergibt
         var bikeDto = new CreateTourDto { Name = "Bike Tour", From = "Vienna", To = "Prague", TransportType = TransportType.Bike };
         var fakeRoute = new RouteResult { DistanceMeters = 330000, Duration = TimeSpan.FromHours(8) };
 
@@ -306,34 +262,26 @@ public class TourServiceTests
         tourRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<Tour>()))
             .ReturnsAsync(savedTour);
 
-        // Act
         await tourService.CreateTourAsync(bikeDto, 1);
 
-        // Assert & Verify
         routeServiceMock.Verify(r => r.GetRouteAsync("Vienna", "Prague", TransportType.Bike), Times.Once);
     }
 
-    // Test 13: GetAllToursAsync respektiert User-Scoping (nur Touren des Users)
     [Test]
     public async Task GetAllToursAsync_CallsRepositoryWithCorrectUserId()
     {
-        // Arrange - Repository wird mit User-ID aufgerufen
         tourRepositoryMock.Setup(r => r.GetAllAsync(5))
             .ReturnsAsync([]);
 
-        // Act
         await tourService.GetAllToursAsync(5);
 
-        // Assert & Verify - Repository wurde mit User ID 5 aufgerufen
         tourRepositoryMock.Verify(r => r.GetAllAsync(5), Times.Once);
         tourRepositoryMock.Verify(r => r.GetAllAsync(It.IsNotIn(5)), Times.Never);
     }
 
-    // Test 14: CreateTourAsync inkludiert korrekte Timestamps
     [Test]
     public async Task CreateTourAsync_SetCreatedAtTimestamp()
     {
-        // Arrange
         var createDto = new CreateTourDto { Name = "Timestamped Tour", From = "Vienna", To = "Prague", TransportType = TransportType.Vacation };
         var fakeRoute = new RouteResult { DistanceMeters = 300000, Duration = TimeSpan.FromHours(3) };
 
@@ -347,10 +295,8 @@ public class TourServiceTests
             .Callback<Tour>(t => capturedTour = t)
             .ReturnsAsync(new Tour { Id = 1, UserId = 1 });
 
-        // Act
         await tourService.CreateTourAsync(createDto, 1);
 
-        // Assert - CreatedAt sollte zwischen beforeCreate und jetzt sein
         Assert.That(capturedTour, Is.Not.Null);
         Assert.That(capturedTour!.CreatedAt, Is.GreaterThanOrEqualTo(beforeCreate));
         Assert.That(capturedTour.CreatedAt, Is.LessThanOrEqualTo(DateTime.UtcNow));
