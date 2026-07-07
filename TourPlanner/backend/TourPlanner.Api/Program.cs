@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.HttpLogging;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,18 @@ using TourPlanner.Data.Repositories;
 using TourPlanner.Data.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields =
+        HttpLoggingFields.RequestMethod |
+        HttpLoggingFields.RequestPath |
+        HttpLoggingFields.ResponseStatusCode;
+});
 
 builder.Services.AddCors(options =>
 {
@@ -106,6 +119,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAngular");
+app.UseHttpLogging();
 app.UseAuthentication();
 app.UseAuthorization();
 

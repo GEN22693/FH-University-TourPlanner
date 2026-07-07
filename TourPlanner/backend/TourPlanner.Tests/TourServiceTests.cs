@@ -129,7 +129,8 @@ public class TourServiceTests
 
         var result = await tourService.UpdateTourAsync(5, updateDto, 1);
 
-        Assert.That(result.Distance, Is.EqualTo(560000));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Distance, Is.EqualTo(560000));
         Assert.That(result.EstimatedTime, Is.EqualTo(TimeSpan.FromHours(5.5)));
 
         routeServiceMock.Verify(
